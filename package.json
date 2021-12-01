@@ -1,0 +1,15 @@
+{
+  "name": "adventofcode2021",
+  "description": "Solutions to Advent of Code 2021",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fildon/AdventOfCode2021.git"
+  },
+  "author": "Rupert McKay",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fildon/AdventOfCode2021/issues"
+  },
+  "homepage": "https://github.com/fildon/AdventOfCode2021#readme"
+}
