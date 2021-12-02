@@ -23,3 +23,11 @@ const countWindowIncreases = (depthMeasurements: number[]): number => {
 const solution = countWindowIncreases(input);
 
 console.log(solution); // 1346
+
+const oneLinerSolution = input
+  .flatMap<{ prior: number; current: number }>((depth, index, depths) =>
+    index < 3 ? [] : { prior: depths[index - 3], current: depth }
+  )
+  .filter(({ prior, current }) => current > prior).length;
+
+console.log(oneLinerSolution); // 1346
