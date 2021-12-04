@@ -11,5 +11,5 @@ Additionally I recommend using the [Deno VSCode extension](https://marketplace.v
 ## Executing solutions
 
 ```shell
-deno run day01/part1.ts
+deno run --allow-read day01/part1.ts
 ```
