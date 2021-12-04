@@ -59,7 +59,7 @@ const hasColWin = (board: Board): boolean => {
   return false;
 };
 
-const isWin = (board: Board): boolean => {
+export const isWin = (board: Board): boolean => {
   return hasRowWin(board) || hasColWin(board);
 };
 
@@ -71,7 +71,10 @@ const applyNumberToRow = (row: BoardRow, numberToMark: number): BoardRow => {
   return newRow as BoardRow;
 };
 
-const applyNumberToBoard = (board: Board, numberToMark: number): Board => {
+export const applyNumberToBoard = (
+  board: Board,
+  numberToMark: number
+): Board => {
   const newBoard = board.map((row) => applyNumberToRow(row, numberToMark));
   return newBoard as Board;
 };
