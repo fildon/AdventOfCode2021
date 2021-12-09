@@ -1,4 +1,9 @@
-import { buildMapFromStrings, solve } from "./part1.ts";
+import {
+  buildMapFromStrings,
+  getRiskOfLowPoints,
+  getBasinSize,
+  getProductOfThreeLargestBasins,
+} from "./basin.ts";
 
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
 
@@ -13,5 +18,25 @@ Deno.test("day09/part1 - builds map from strings", () => {
 });
 
 Deno.test("day09/part1 - solved", () => {
-  assertEquals(solve(), 528);
+  assertEquals(getRiskOfLowPoints(), 528);
+});
+
+Deno.test("day09/part2 - getBasinSize", () => {
+  assertEquals(
+    getBasinSize(
+      [
+        [2, 1, 9, 9, 9, 4, 3, 2, 1, 0],
+        [3, 9, 8, 7, 8, 9, 4, 9, 2, 1],
+        [9, 8, 5, 6, 7, 8, 9, 8, 9, 2],
+        [8, 7, 6, 7, 8, 9, 6, 7, 8, 9],
+        [9, 8, 9, 9, 9, 6, 5, 6, 7, 8],
+      ],
+      [0, 9]
+    ),
+    9
+  );
+});
+
+Deno.test("day09/part2 - solved", () => {
+  assertEquals(getProductOfThreeLargestBasins(), 920448);
 });
