@@ -15,4 +15,4 @@ const solve = (filePath: string) => {
   );
 };
 
-console.log(solve("day08/input.txt"));
+console.log(solve("day08/input.txt")); // 245

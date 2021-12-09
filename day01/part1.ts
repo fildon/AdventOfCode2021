@@ -13,6 +13,8 @@ const countDepthIncreases = (depthMeasurements: number[]): number => {
   return increases;
 };
 
-const solution = countDepthIncreases(input);
+export const solve = () => {
+  return countDepthIncreases(input);
+};
 
-console.log(solution); // 1301
+console.log(solve()); // 1301

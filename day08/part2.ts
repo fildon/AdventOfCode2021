@@ -1,3 +1,5 @@
+import { getInputStrings } from "../utils/inputparsing.ts";
+
 /**
  * 8, 4, 7, 1 are each uniquely identified by length
  *
@@ -74,11 +76,10 @@ const getLineReading = (line: string): number => {
 };
 
 const solve = (filePath: string) => {
-  return Deno.readTextFileSync(filePath)
-    .split(/\n/)
+  return getInputStrings(filePath)
     .filter((str) => str.length > 0)
     .map(getLineReading)
     .reduce((acc, curr) => acc + curr);
 };
 
-console.log(solve("day08/input.txt"));
+console.log(solve("day08/input.txt")); // 983026

@@ -1,7 +1,9 @@
 {
   "name": "adventofcode2021",
   "description": "Solutions to Advent of Code 2021",
-  "scripts": {},
+  "scripts": {
+    "test": "deno test --allow-read"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fildon/AdventOfCode2021.git"
