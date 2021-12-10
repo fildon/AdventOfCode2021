@@ -9,4 +9,4 @@ const corruptions = inputLines
   // Filter out 'undefined' corruptions (i.e. valid lines)
   .filter((corruption): corruption is Closer => !!corruption);
 const score = getScore(corruptions);
-console.log(score);
+console.log(score); // 462693
