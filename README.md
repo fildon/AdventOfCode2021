@@ -10,6 +10,16 @@ Additionally I recommend using the [Deno VSCode extension](https://marketplace.v
 
 ## Executing solutions
 
+Each day has a folder, and each part is a file. To execute a solution run that file with deno. Additionally the `--allow-read` flag must be passed to allow the Deno runtime to read puzzle input files.
+
 ```shell
 deno run --allow-read day01/part1.ts
+```
+
+## Testing
+
+Tests are written using Deno's in-built test runner and assertions. You can run all tests with:
+
+```shell
+npm t
 ```
