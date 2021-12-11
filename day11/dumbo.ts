@@ -115,3 +115,11 @@ export const stepN = (
   const { dumboMap: newMap, flashCount: newFlashCount } = stepOnce(dumboMap);
   return stepN(newMap, n - 1, flashCount + newFlashCount);
 };
+
+export const stepUntilAllFlashed = (
+  dumboMap: DumboMap,
+  stepCount = 0
+): number => {
+  if (dumboMap.flat().every((dumbo) => dumbo.energy === 0)) return stepCount;
+  return stepUntilAllFlashed(stepOnce(dumboMap).dumboMap, stepCount + 1);
+};
