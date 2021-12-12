@@ -1,6 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { buildEdges, findPaths } from "./cave.ts";
-import { solve as solvePart1 } from "./part1.ts";
+import { buildEdges, findPaths, solvePart1, solvePart2 } from "./cave.ts";
 
 Deno.test("day12/part1/buildEdges", () => {
   // Basic case
@@ -34,7 +33,9 @@ Deno.test("day12/part1/findPaths", () => {
         ["b", "d"],
         ["b", "end"],
         ["b", "start"],
-      ])
+      ]),
+      (node, currentPath) =>
+        node.toUpperCase() === node || !currentPath.includes(node)
     ),
     new Set([
       ["start", "A", "b", "A", "c", "A", "end"],
@@ -56,4 +57,11 @@ Deno.test("day12/part1/solvePart1", () => {
   assertEquals(solvePart1("day12/testinput2.txt"), 19);
   assertEquals(solvePart1("day12/testinput3.txt"), 226);
   assertEquals(solvePart1("day12/input.txt"), 3679);
+});
+
+Deno.test("day12/part2/solvePart2", () => {
+  assertEquals(solvePart2("day12/testinput1.txt"), 36);
+  assertEquals(solvePart2("day12/testinput2.txt"), 103);
+  assertEquals(solvePart2("day12/testinput3.txt"), 3509);
+  assertEquals(solvePart2("day12/input.txt"), 107395);
 });

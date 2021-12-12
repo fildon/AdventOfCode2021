@@ -1,3 +1,5 @@
+import { getInputStrings } from "../utils/inputparsing.ts";
+
 type Edges = Set<[string, string]>;
 
 export const buildEdges = (
@@ -20,7 +22,10 @@ export const buildEdges = (
  */
 type Path = Array<string>;
 
-export const findPaths = (edges: Edges): Set<Path> => {
+export const findPaths = (
+  edges: Edges,
+  nodeValidator: (node: string, currentPath: Path) => boolean
+): Set<Path> => {
   const partialPaths: Array<Path> = [["start"]];
   const completedPaths: Set<Path> = new Set();
   while (partialPaths.length > 0) {
@@ -36,11 +41,7 @@ export const findPaths = (edges: Edges): Set<Path> => {
         // we want to grab the node on the edge that _isn't_ the current one
         a === currentPosition ? b : a
       )
-      .filter(
-        // We only keep nodes that are BIG or have not already appeared in this path
-        // i.e. a 'small' node can only appear at most once
-        (node) => node.toUpperCase() === node || !workingPath.includes(node)
-      );
+      .filter((node) => nodeValidator(node, workingPath));
     const newPartialPaths = adjacentNodes
       .filter((node) => node !== "end")
       .map((node) => [...workingPath, node]);
@@ -51,4 +52,48 @@ export const findPaths = (edges: Edges): Set<Path> => {
     newCompletedPaths.forEach((newPath) => completedPaths.add(newPath));
   }
   return completedPaths;
+};
+
+const part1Validator = (node: string, currentPath: Path) => {
+  // We can always visit a big cave
+  if (node.toUpperCase() === node) return true;
+  // We can only visit a small cave once
+  return !currentPath.includes(node);
+};
+
+export const solvePart1 = (filePath: string) => {
+  const inputStrings = getInputStrings(filePath).filter(
+    (str) => str.length > 0
+  );
+  const edges = buildEdges(inputStrings);
+  const paths = findPaths(edges, part1Validator);
+  return paths.size;
+};
+
+/**
+ * Returns true if and only if this path has already visited a small cave twice
+ */
+const hasDoubleSmall = (path: Path): boolean => {
+  const smallCaveVisits = path.filter((node) => node.toLowerCase() === node);
+  return new Set(smallCaveVisits).size !== smallCaveVisits.length;
+};
+
+const part2Validator = (node: string, currentPath: Path) => {
+  // We mustn't return to start
+  if (node === "start") return false;
+  // We can always visit a big cave
+  if (node.toUpperCase() === node) return true;
+  // We must not make another small double if there already is one
+  if (hasDoubleSmall(currentPath)) return !currentPath.includes(node);
+  // All other cases are permitted
+  return true;
+};
+
+export const solvePart2 = (filePath: string) => {
+  const inputStrings = getInputStrings(filePath).filter(
+    (str) => str.length > 0
+  );
+  const edges = buildEdges(inputStrings);
+  const paths = findPaths(edges, part2Validator);
+  return paths.size;
 };
