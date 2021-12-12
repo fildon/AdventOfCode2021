@@ -16,6 +16,8 @@ Each day has a folder, and each part is a file. To execute a solution run that f
 deno run --allow-read day01/part1.ts
 ```
 
+Starting from day12 however solutions are not logged out, instead you should inspect the corresponding test file to see the solution in a test assertion.
+
 ## Testing
 
 Tests are written using Deno's in-built test runner and assertions. You can run all tests with:
