@@ -112,49 +112,47 @@ Deno.test("day12/part1/findPaths", () => {
     ])
   );
 });
-const findPaths = (
-  graph: Graph,
-  partialPaths: Array<Path> = [["start"]],
-  completePaths: Set<Path> = new Set()
-): Set<Path> => {
-  if (partialPaths.length === 0) return completePaths;
+const findPaths = (graph: Graph): Set<Path> => {
+  const partialPaths: Array<Path> = [["start"]];
+  const completedPaths: Set<Path> = new Set();
   const { edges } = graph;
-  const [workingPath, ...otherPaths] = partialPaths;
-  const currentPosition = workingPath.at(-1);
-  if (!currentPosition) throw new Error("Found empty working path");
-  const adjacentEdges = [...edges.values()].filter((edge) =>
-    edge.includes(currentPosition)
-  );
-  const adjacentNodes = adjacentEdges
-    .map(([a, b]) =>
-      // we want to grab the node on the edge that _isn't_ the current one
-      a === currentPosition ? b : a
-    )
-    .filter(
-      // We only keep nodes that are BIG or have not already appeared in this path
-      // i.e. a 'small' node can only appear at most once
-      (node) => node.toUpperCase() === node || !workingPath.includes(node)
+  while (partialPaths.length > 0) {
+    const workingPath = partialPaths.pop();
+    if (!workingPath) throw new Error("Popped an empty array!");
+    const currentPosition = workingPath.at(-1);
+    if (!currentPosition) throw new Error("Found empty working path");
+    const adjacentEdges = [...edges.values()].filter((edge) =>
+      edge.includes(currentPosition)
     );
-  const newPartialPaths = adjacentNodes
-    .filter((node) => node !== "end")
-    .map((node) => [...workingPath, node]);
-  const newCompletedPaths = adjacentNodes
-    .filter((node) => node === "end")
-    .map((node) => [...workingPath, node]);
-  return findPaths(
-    graph,
-    otherPaths.concat(newPartialPaths),
-    new Set([...completePaths, ...newCompletedPaths])
-  );
+    const adjacentNodes = adjacentEdges
+      .map(([a, b]) =>
+        // we want to grab the node on the edge that _isn't_ the current one
+        a === currentPosition ? b : a
+      )
+      .filter(
+        // We only keep nodes that are BIG or have not already appeared in this path
+        // i.e. a 'small' node can only appear at most once
+        (node) => node.toUpperCase() === node || !workingPath.includes(node)
+      );
+    const newPartialPaths = adjacentNodes
+      .filter((node) => node !== "end")
+      .map((node) => [...workingPath, node]);
+    const newCompletedPaths = adjacentNodes
+      .filter((node) => node === "end")
+      .map((node) => [...workingPath, node]);
+    newPartialPaths.forEach((newPath) => partialPaths.push(newPath));
+    newCompletedPaths.forEach((newPath) => completedPaths.add(newPath));
+  }
+  return completedPaths;
 };
 
-Deno.test("day12/part1/solve", () => {
-  assertEquals(solve("day12/testinput1.txt"), 10);
-  assertEquals(solve("day12/testinput2.txt"), 19);
-  assertEquals(solve("day12/testinput3.txt"), 226);
-  // assertEquals(solve("day12/input.txt"), 0);
+Deno.test("day12/part1/solvePart1", () => {
+  assertEquals(solvePart1("day12/testinput1.txt"), 10);
+  assertEquals(solvePart1("day12/testinput2.txt"), 19);
+  assertEquals(solvePart1("day12/testinput3.txt"), 226);
+  assertEquals(solvePart1("day12/input.txt"), 3679);
 });
-const solve = (filePath: string): number => {
+const solvePart1 = (filePath: string): number => {
   const inputStrings = getInputStrings(filePath).filter(
     (str) => str.length > 0
   );
