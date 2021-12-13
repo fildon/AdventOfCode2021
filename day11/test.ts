@@ -8,7 +8,7 @@ import {
   resetFlashed,
 } from "./dumbo.ts";
 
-Deno.test("Builds dumbo map from input", () => {
+Deno.test("day11/Builds dumbo map from input", () => {
   assertEquals(buildDumboMap(["12", "34"]), [
     [
       { energy: 1, flashed: false, row: 0, col: 0 },
@@ -21,7 +21,7 @@ Deno.test("Builds dumbo map from input", () => {
   ]);
 });
 
-Deno.test("Can update a dumbo in a map", () => {
+Deno.test("day11/Can update a dumbo in a map", () => {
   assertEquals(
     updateDumboAt(
       [
@@ -49,7 +49,7 @@ Deno.test("Can update a dumbo in a map", () => {
   );
 });
 
-Deno.test("gets neighbours", () => {
+Deno.test("day11/gets neighbours", () => {
   assertEquals(
     getNeighbours(
       [
@@ -81,7 +81,7 @@ Deno.test("gets neighbours", () => {
   );
 });
 
-Deno.test("runs a single flash wave", () => {
+Deno.test("day11/runs a single flash wave", () => {
   assertEquals(
     flashWaveOnce([
       [
@@ -150,7 +150,7 @@ Deno.test("runs a single flash wave", () => {
   );
 });
 
-Deno.test("increments all", () => {
+Deno.test("day11/increments all", () => {
   assertEquals(
     incrementAll([
       [
@@ -189,7 +189,7 @@ Deno.test("increments all", () => {
   );
 });
 
-Deno.test("resets flashers", () => {
+Deno.test("day11/resets flashers", () => {
   assertEquals(
     resetFlashed([
       [

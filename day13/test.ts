@@ -1,7 +1,7 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { parseInput, foldPoints, solvePart1 } from "./origami.ts";
+import { parseInput, foldPoints, solvePart1, solvePart2 } from "./origami.ts";
 
-Deno.test("parses input", () => {
+Deno.test("day13/parses input", () => {
   assertEquals(
     parseInput([
       "6,10",
@@ -59,7 +59,7 @@ Deno.test("parses input", () => {
   );
 });
 
-Deno.test("folds points", () => {
+Deno.test("day13/folds points", () => {
   assertEquals(
     foldPoints(
       [
@@ -97,7 +97,21 @@ Deno.test("folds points", () => {
   );
 });
 
-Deno.test("solves part 1", () => {
+Deno.test("day13/solve part 1", () => {
   assertEquals(solvePart1("day13/testinput.txt"), 17);
   assertEquals(solvePart1("day13/input.txt"), 745);
+});
+
+Deno.test("day13/solve part 2", () => {
+  assertEquals(
+    solvePart2(),
+    [
+      " ██  ███  █  █   ██ ████ ███   ██   ██ ",
+      "█  █ █  █ █ █     █ █    █  █ █  █ █  █",
+      "█  █ ███  ██      █ ███  ███  █    █   ",
+      "████ █  █ █ █     █ █    █  █ █ ██ █   ",
+      "█  █ █  █ █ █  █  █ █    █  █ █  █ █  █",
+      "█  █ ███  █  █  ██  █    ███   ███  ██ ",
+    ].join("\n")
+  );
 });
