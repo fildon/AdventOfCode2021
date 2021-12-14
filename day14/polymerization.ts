@@ -2,7 +2,16 @@ import { getInputStrings } from "../utils/inputparsing.ts";
 
 export const parseInput = (inputLines: Array<string>) => {
   const template = inputLines[0];
-  const insertions = Object.fromEntries(
+  const pairs = [...template]
+    .flatMap((char, i) => {
+      if (i === 0) return [];
+      return `${template[i - 1]}${char}`;
+    })
+    .reduce(
+      (acc, pair) => ({ ...acc, [pair]: (acc[pair] ?? 0) + 1 }),
+      {} as { [pair: string]: number }
+    );
+  const rules = Object.fromEntries(
     inputLines
       .filter((line) => line.includes("->"))
       .map((line) => {
@@ -11,46 +20,98 @@ export const parseInput = (inputLines: Array<string>) => {
         return [line.slice(0, 2), last];
       })
   );
-  return { template, insertions };
+  const letterCounts = [...template].reduce((acc, curr) => {
+    return { ...acc, [curr]: (acc[curr] ?? 0) + 1 };
+  }, {} as { [letter: string]: number });
+  return { pairs, rules, letterCounts };
+};
+
+const mergeObjects = (
+  a: { [key: string]: number },
+  b: { [key: string]: number }
+) => {
+  const allKeys = [...new Set(Object.keys(a).concat(Object.keys(b)))];
+  return Object.fromEntries(
+    allKeys.map((key) => {
+      const value = (a[key] ?? 0) + (b[key] ?? 0);
+      return [key, value];
+    })
+  );
 };
 
 export const stepOnce = (
-  polymer: string,
-  rules: { [pair: string]: string }
+  pairs: { [pair: string]: number },
+  rules: { [pair: string]: string },
+  letterCounts: { [letter: string]: number }
 ) => {
-  return [...polymer]
-    .flatMap((char, i) => {
-      if (i === 0) return char;
-      const pair = `${polymer[i - 1]}${char}`;
-      return `${rules[pair]}${char}`;
+  const { newPairs, newCounts } = Object.entries(pairs)
+    .map(([pair, count]) => {
+      const middle = rules[pair];
+      const [left, right] = pair;
+      const leftPair = [left, middle].join("");
+      const rightPair = [middle, right].join("");
+      return {
+        newPairs: {
+          [leftPair]: count,
+          [rightPair]: count,
+        },
+        newCounts: { [middle]: 1 },
+      };
     })
-    .join("");
+    .reduce(
+      (acc, curr) => {
+        return {
+          newPairs: mergeObjects(acc.newPairs, curr.newPairs),
+          newCounts: mergeObjects(acc.newCounts, curr.newCounts),
+        };
+      },
+      { newPairs: {}, newCounts: {} }
+    );
+
+  return {
+    pairs: newPairs,
+    letterCounts: mergeObjects(letterCounts, newCounts),
+  };
 };
 
 export const stepN = (
-  polymer: string,
+  pairs: { [pair: string]: number },
   rules: { [pair: string]: string },
+  counts: { [letter: string]: number },
   steps: number
 ) => {
-  let workingString = [...polymer].join("");
+  let workingCounts = { ...counts };
+  let workingPairs = { ...pairs };
   while (steps > 0) {
-    workingString = stepOnce(workingString, rules);
+    const { pairs, letterCounts } = stepOnce(
+      workingPairs,
+      rules,
+      workingCounts
+    );
+    workingPairs = pairs;
+    workingCounts = letterCounts;
     steps--;
   }
-  return workingString;
+
+  return workingCounts;
 };
 
-export const solvePart1 = (filePath: string) => {
-  const inputLines = getInputStrings(filePath);
-  const { template, insertions } = parseInput(inputLines);
-  const polymer = stepN(template, insertions, 10);
-  const letters = new Set([...polymer]);
-  const letterCounts = [...letters.values()]
-    .map((letter) => [...polymer].filter((s) => s === letter).length)
-    .sort((a, b) => a - b);
-  const biggestCount = letterCounts.at(-1);
-  const smallestCount = letterCounts.at(0);
-  if (!biggestCount) throw new Error("No biggest count!?");
-  if (!smallestCount) throw new Error("No smallest count!?");
-  return biggestCount - smallestCount;
-};
+// export const solvePart1 = (filePath: string) => {
+//   const inputLines = getInputStrings(filePath);
+//   const { pairs, rules } = parseInput(inputLines);
+//   const resultingPairs = stepN(pairs, rules, 10);
+
+//   // const letters = new Set([...polymer]);
+//   // const letterCounts = [...letters.values()]
+//   //   .map((letter) => [...polymer].filter((s) => s === letter).length)
+//   //   .sort((a, b) => a - b);
+//   // const biggestCount = letterCounts.at(-1);
+//   // const smallestCount = letterCounts.at(0);
+//   // if (!biggestCount) throw new Error("No biggest count!?");
+//   // if (!smallestCount) throw new Error("No smallest count!?");
+//   // return biggestCount - smallestCount;
+// };
+
+// export const solvePart2 = (filePath: string) => {
+//   return 0;
+// };
