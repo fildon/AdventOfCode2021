@@ -26,51 +26,27 @@ export const parseInput = (inputLines: Array<string>) => {
   return { pairs, rules, letterCounts };
 };
 
-const mergeObjects = (
-  a: { [key: string]: number },
-  b: { [key: string]: number }
-) => {
-  const allKeys = [...new Set(Object.keys(a).concat(Object.keys(b)))];
-  return Object.fromEntries(
-    allKeys.map((key) => {
-      const value = (a[key] ?? 0) + (b[key] ?? 0);
-      return [key, value];
-    })
-  );
-};
-
 export const stepOnce = (
   pairs: { [pair: string]: number },
   rules: { [pair: string]: string },
   letterCounts: { [letter: string]: number }
 ) => {
-  const { newPairs, newCounts } = Object.entries(pairs)
-    .map(([pair, count]) => {
-      const middle = rules[pair];
-      const [left, right] = pair;
-      const leftPair = [left, middle].join("");
-      const rightPair = [middle, right].join("");
-      return {
-        newPairs: {
-          [leftPair]: count,
-          [rightPair]: count,
-        },
-        newCounts: { [middle]: 1 },
-      };
-    })
-    .reduce(
-      (acc, curr) => {
-        return {
-          newPairs: mergeObjects(acc.newPairs, curr.newPairs),
-          newCounts: mergeObjects(acc.newCounts, curr.newCounts),
-        };
-      },
-      { newPairs: {}, newCounts: {} }
-    );
+  const newPairs = {} as { [pair: string]: number };
+  const newLetterCounts = { ...letterCounts };
+
+  Object.entries(pairs).forEach(([pair, count]) => {
+    const middle = rules[pair];
+    const [left, right] = pair;
+    const leftPair = `${left}${middle}`;
+    const rightPair = `${middle}${right}`;
+    newLetterCounts[middle] = (newLetterCounts[middle] ?? 0) + count;
+    newPairs[leftPair] = (newPairs[leftPair] ?? 0) + count;
+    newPairs[rightPair] = (newPairs[rightPair] ?? 0) + count;
+  });
 
   return {
     pairs: newPairs,
-    letterCounts: mergeObjects(letterCounts, newCounts),
+    letterCounts: newLetterCounts,
   };
 };
 
@@ -96,22 +72,19 @@ export const stepN = (
   return workingCounts;
 };
 
-// export const solvePart1 = (filePath: string) => {
-//   const inputLines = getInputStrings(filePath);
-//   const { pairs, rules } = parseInput(inputLines);
-//   const resultingPairs = stepN(pairs, rules, 10);
+const countDiffAfterNSteps = (filePath: string, steps: number) => {
+  const inputLines = getInputStrings(filePath);
+  const { pairs, rules, letterCounts } = parseInput(inputLines);
+  const finalCounts = stepN(pairs, rules, letterCounts, steps);
 
-//   // const letters = new Set([...polymer]);
-//   // const letterCounts = [...letters.values()]
-//   //   .map((letter) => [...polymer].filter((s) => s === letter).length)
-//   //   .sort((a, b) => a - b);
-//   // const biggestCount = letterCounts.at(-1);
-//   // const smallestCount = letterCounts.at(0);
-//   // if (!biggestCount) throw new Error("No biggest count!?");
-//   // if (!smallestCount) throw new Error("No smallest count!?");
-//   // return biggestCount - smallestCount;
-// };
+  const sortedCounts = Object.values(finalCounts).sort((a, b) => a - b);
+  const smallest = sortedCounts.at(0)!;
+  const biggest = sortedCounts.at(-1)!;
+  return biggest - smallest;
+};
 
-// export const solvePart2 = (filePath: string) => {
-//   return 0;
-// };
+export const solvePart1 = (filePath: string) =>
+  countDiffAfterNSteps(filePath, 10);
+
+export const solvePart2 = (filePath: string) =>
+  countDiffAfterNSteps(filePath, 40);
