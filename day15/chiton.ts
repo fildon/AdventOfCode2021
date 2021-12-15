@@ -47,8 +47,7 @@ const buildLocationCostMap = (
   };
 };
 
-export const solvePart1 = (filePath: string) => {
-  const riskMap = parseInput(getInputStrings(filePath));
+const aStarSearch = (riskMap: number[][]) => {
   const goal: Location = [riskMap[0].length - 1, riskMap.length - 1];
   const [goalX, goalY] = goal;
   const start: Location = [0, 0];
@@ -96,4 +95,28 @@ export const solvePart1 = (filePath: string) => {
     });
   }
   throw new Error("Failed to reach goal!");
+};
+
+export const solvePart1 = (filePath: string) => {
+  return aStarSearch(parseInput(getInputStrings(filePath)));
+};
+
+export const solvePart2 = (filePath: string) => {
+  const riskMap = parseInput(getInputStrings(filePath));
+  const baseWidth = riskMap[0].length;
+  const baseHeight = riskMap.length;
+  const expandedMap: number[][] = [];
+  for (let rowIndex = 0; rowIndex < 5 * baseHeight; rowIndex++) {
+    const row = [];
+    for (let colIndex = 0; colIndex < 5 * baseWidth; colIndex++) {
+      const baseRisk = riskMap[rowIndex % baseHeight][colIndex % baseWidth];
+      const additionalXCost = Math.floor(colIndex / baseWidth);
+      const additionalYCost = Math.floor(rowIndex / baseHeight);
+      const totalRisk = (baseRisk + additionalXCost + additionalYCost) % 9;
+      // We need the '|| 9' to get the effect of a mod 9 operation that ranges from 1 to 9 rather than 0 to 8
+      row.push(totalRisk || 9);
+    }
+    expandedMap.push(row);
+  }
+  return aStarSearch(expandedMap);
 };

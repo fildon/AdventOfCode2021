@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { parseInput, hCost, solvePart1 } from "./chiton.ts";
+import { parseInput, hCost, solvePart1, solvePart2 } from "./chiton.ts";
 
 const exampleRiskMap = [
   [1, 1, 6, 3, 7, 5, 1, 7, 4, 2],
@@ -41,4 +41,9 @@ Deno.test("day15/computes heuristic cost", () => {
 Deno.test("day15/solves part 1", () => {
   assertEquals(solvePart1("day15/testinput.txt"), 40);
   assertEquals(solvePart1("day15/input.txt"), 702);
+});
+
+Deno.test("day15/solves part 2", () => {
+  assertEquals(solvePart2("day15/testinput.txt"), 315);
+  assertEquals(solvePart2("day15/input.txt"), 2955);
 });
