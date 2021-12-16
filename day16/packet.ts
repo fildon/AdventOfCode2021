@@ -40,13 +40,13 @@ export const toInt = (bits: BitArray): number => {
 };
 
 type LiteralValuePacket = {
-  type: "literal";
+  typeID: 4;
   version: number;
   value: number;
 };
 
 type OperatorPacket = {
-  type: "operator";
+  typeID: 0 | 1 | 2 | 3 | 5 | 6 | 7;
   version: number;
   children: Array<Packet>;
 };
@@ -76,7 +76,7 @@ export const parseLiteralValuePacket = (
   }
   return {
     packet: {
-      type: "literal",
+      typeID: 4,
       version: toInt(toBitArray(packet.slice(0, 3))),
       value: toInt(literalValueBits),
     },
@@ -115,7 +115,9 @@ export const parseOperatorPacket = (
 
   return {
     packet: {
-      type: "operator",
+      typeID: toInt(
+        toBitArray(transmission.slice(startingPointer + 3, startingPointer + 6))
+      ) as 0 | 1 | 2 | 3 | 5 | 6 | 7,
       version: toInt(bits.slice(0, 3)),
       children,
     },
@@ -136,7 +138,7 @@ export const parsePacket = (
 };
 
 const countVersion = (packet: Packet): number => {
-  if (packet.type === "literal") return packet.version;
+  if (packet.typeID === 4) return packet.version;
   return (
     packet.version +
     packet.children
@@ -149,4 +151,57 @@ export const solvePart1 = (filePath: string): number => {
   const hex = getInputStrings(filePath)[0];
   const packetTree = parsePacket(hexToBitArray(hex).join("")).packet;
   return countVersion(packetTree);
+};
+
+const evaluatePacket = (packet: Packet): number => {
+  // sum
+  if (packet.typeID === 0)
+    return packet.children
+      .map((child) => evaluatePacket(child))
+      .reduce((acc, curr) => acc + curr, 0);
+  // product
+  if (packet.typeID === 1)
+    return packet.children
+      .map((child) => evaluatePacket(child))
+      .reduce((acc, curr) => acc * curr, 1);
+  // minimum
+  if (packet.typeID === 2)
+    return packet.children
+      .map((child) => evaluatePacket(child))
+      .reduce((acc, curr) => Math.min(acc, curr));
+  // maximum
+  if (packet.typeID === 3)
+    return packet.children
+      .map((child) => evaluatePacket(child))
+      .reduce((acc, curr) => Math.max(acc, curr));
+  // literal value
+  if (packet.typeID === 4) return packet.value;
+  // greater than
+  if (packet.typeID === 5)
+    return evaluatePacket(packet.children[0]) >
+      evaluatePacket(packet.children[1])
+      ? 1
+      : 0;
+  // less than
+  if (packet.typeID === 6)
+    return evaluatePacket(packet.children[0]) <
+      evaluatePacket(packet.children[1])
+      ? 1
+      : 0;
+  // equal to
+  if (packet.typeID === 7)
+    return evaluatePacket(packet.children[0]) ===
+      evaluatePacket(packet.children[1])
+      ? 1
+      : 0;
+  throw new Error("lol get a better switch syntax");
+};
+
+export const solvePart2Hex = (hex: string): number => {
+  const packetTree = parsePacket(hexToBitArray(hex).join("")).packet;
+  return evaluatePacket(packetTree);
+};
+
+export const solvePart2 = (filePath: string): number => {
+  return solvePart2Hex(getInputStrings(filePath)[0]);
 };

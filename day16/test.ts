@@ -10,6 +10,8 @@ import {
   parseOperatorPacket,
   parsePacket,
   solvePart1,
+  solvePart2Hex,
+  solvePart2,
 } from "./packet.ts";
 
 Deno.test("day16/converts hex to binary", () => {
@@ -59,7 +61,7 @@ Deno.test("day16/parses literal value packet", () => {
   // Shortest valid input
   assertEquals(parseLiteralValuePacket("00010001000"), {
     packet: {
-      type: "literal",
+      typeID: 4,
       version: 0,
       value: 8,
     },
@@ -68,7 +70,7 @@ Deno.test("day16/parses literal value packet", () => {
   // Example from puzzle text
   assertEquals(parseLiteralValuePacket("110100101111111000101000"), {
     packet: {
-      type: "literal",
+      typeID: 4,
       version: 6,
       value: 2021,
     },
@@ -85,15 +87,15 @@ Deno.test({
       ),
       {
         packet: {
-          type: "operator",
+          typeID: 6,
           version: 1,
           children: [
             {
-              type: "literal",
+              typeID: 4,
               version: 6,
               value: 10,
             },
-            { type: "literal", version: 2, value: 20 },
+            { typeID: 4, version: 2, value: 20 },
           ],
         },
         pointer: 49,
@@ -101,19 +103,19 @@ Deno.test({
     );
     assertEquals(parsePacket(hexToBitArray("8A004A801A8002F478").join("")), {
       packet: {
-        type: "operator",
+        typeID: 2,
         version: 4,
         children: [
           {
-            type: "operator",
+            typeID: 2,
             version: 1,
             children: [
               {
-                type: "operator",
+                typeID: 2,
                 version: 5,
                 children: [
                   {
-                    type: "literal",
+                    typeID: 4,
                     version: 6,
                     value: 15,
                   },
@@ -129,36 +131,36 @@ Deno.test({
       parsePacket(hexToBitArray("620080001611562C8802118E34").join("")),
       {
         packet: {
-          type: "operator",
+          typeID: 0,
           version: 3,
           children: [
             {
-              type: "operator",
+              typeID: 0,
               version: 0,
               children: [
                 {
-                  type: "literal",
+                  typeID: 4,
                   version: 0,
                   value: 10,
                 },
                 {
-                  type: "literal",
+                  typeID: 4,
                   version: 5,
                   value: 11,
                 },
               ],
             },
             {
-              type: "operator",
+              typeID: 0,
               version: 1,
               children: [
                 {
-                  type: "literal",
+                  typeID: 4,
                   version: 0,
                   value: 12,
                 },
                 {
-                  type: "literal",
+                  typeID: 4,
                   version: 3,
                   value: 13,
                 },
@@ -173,36 +175,36 @@ Deno.test({
       parsePacket(hexToBitArray("C0015000016115A2E0802F182340").join("")),
       {
         packet: {
-          type: "operator",
+          typeID: 0,
           version: 6,
           children: [
             {
-              type: "operator",
+              typeID: 0,
               version: 0,
               children: [
                 {
-                  type: "literal",
+                  typeID: 4,
                   value: 10,
                   version: 0,
                 },
                 {
-                  type: "literal",
+                  typeID: 4,
                   value: 11,
                   version: 6,
                 },
               ],
             },
             {
-              type: "operator",
+              typeID: 0,
               version: 4,
               children: [
                 {
-                  type: "literal",
+                  typeID: 4,
                   value: 12,
                   version: 7,
                 },
                 {
-                  type: "literal",
+                  typeID: 4,
                   value: 13,
                   version: 0,
                 },
@@ -217,39 +219,39 @@ Deno.test({
       parsePacket(hexToBitArray("A0016C880162017C3686B18A3D4780").join("")),
       {
         packet: {
-          type: "operator",
+          typeID: 0,
           version: 5,
           children: [
             {
-              type: "operator",
+              typeID: 0,
               version: 1,
               children: [
                 {
-                  type: "operator",
+                  typeID: 0,
                   version: 3,
                   children: [
                     {
-                      type: "literal",
+                      typeID: 4,
                       value: 6,
                       version: 7,
                     },
                     {
-                      type: "literal",
+                      typeID: 4,
                       value: 6,
                       version: 6,
                     },
                     {
-                      type: "literal",
+                      typeID: 4,
                       value: 12,
                       version: 5,
                     },
                     {
-                      type: "literal",
+                      typeID: 4,
                       value: 15,
                       version: 2,
                     },
                     {
-                      type: "literal",
+                      typeID: 4,
                       value: 15,
                       version: 2,
                     },
@@ -273,5 +275,20 @@ Deno.test({
     assertEquals(solvePart1("day16/testinput3.txt"), 23);
     assertEquals(solvePart1("day16/testinput4.txt"), 31);
     assertEquals(solvePart1("day16/input.txt"), 977);
+  },
+});
+
+Deno.test({
+  name: "day16/solves part 2",
+  fn: () => {
+    assertEquals(solvePart2Hex("C200B40A82"), 3);
+    assertEquals(solvePart2Hex("04005AC33890"), 54);
+    assertEquals(solvePart2Hex("880086C3E88112"), 7);
+    assertEquals(solvePart2Hex("CE00C43D881120"), 9);
+    assertEquals(solvePart2Hex("D8005AC2A8F0"), 1);
+    assertEquals(solvePart2Hex("F600BC2D8F"), 0);
+    assertEquals(solvePart2Hex("9C005AC2F8F0"), 0);
+    assertEquals(solvePart2Hex("9C0141080250320F1802104A08"), 1);
+    assertEquals(solvePart2("day16/input.txt"), 101501020883);
   },
 });
