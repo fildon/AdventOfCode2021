@@ -43,7 +43,14 @@ Deno.test("day15/solves part 1", () => {
   assertEquals(solvePart1("day15/input.txt"), 702);
 });
 
-Deno.test("day15/solves part 2", () => {
+Deno.test("day15/solves part 2 test input", () => {
   assertEquals(solvePart2("day15/testinput.txt"), 315);
-  assertEquals(solvePart2("day15/input.txt"), 2955);
+});
+
+Deno.test({
+  name: "day15/solves part 2",
+  ignore: true, // This test does pass... but takes 10 seconds to run
+  fn: () => {
+    assertEquals(solvePart2("day15/input.txt"), 2955);
+  },
 });
