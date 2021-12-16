@@ -1,0 +1,40 @@
+type BitArray = Array<0 | 1>;
+
+export const hexToBitArray = (hex: string): BitArray => {
+  let int = parseInt(hex, 16);
+  const result: BitArray = [];
+  while (int > 0) {
+    result.unshift((int % 2) as 0 | 1);
+    int = int >> 1;
+  }
+  return result;
+};
+
+export const toInt = (bits: BitArray): number => {
+  return bits
+    .map((bit, power) => bit * 2 ** (bits.length - power - 1))
+    .reduce((acc, curr) => acc + curr, 0);
+};
+
+export const parsePacketType4 = (bits: BitArray): number => {
+  if (bits.length < 11 && bits.length % 5 !== 6)
+    throw new Error("Type 4 packet with unexpected length");
+  if (toInt(bits.slice(3, 6)) !== 4) throw new Error("Type ID is not 4");
+  let lastBitGroup = false;
+  let pointer = 6; // first non-header bit position
+  const literalValueBits: BitArray = [];
+  while (!lastBitGroup) {
+    lastBitGroup = bits[pointer] === 0;
+    literalValueBits.push(bits[pointer + 1]);
+    literalValueBits.push(bits[pointer + 2]);
+    literalValueBits.push(bits[pointer + 3]);
+    literalValueBits.push(bits[pointer + 4]);
+    pointer += 5;
+  }
+  return toInt(literalValueBits);
+};
+
+export const solvePart1 = (filePath: string): number => {
+  // TODO
+  return 0;
+};
