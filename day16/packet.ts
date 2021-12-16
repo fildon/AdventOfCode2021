@@ -1,13 +1,29 @@
+import { getInputStrings } from "../utils/inputparsing.ts";
+
 type BitArray = Array<0 | 1>;
 
 export const hexToBitArray = (hex: string): BitArray => {
-  let int = parseInt(hex, 16);
-  const result: BitArray = [];
-  while (int > 0) {
-    result.unshift((int % 2) as 0 | 1);
-    int = int >> 1;
-  }
-  return result;
+  return [...hex].flatMap(
+    (char) =>
+      ({
+        0: [0, 0, 0, 0],
+        1: [0, 0, 0, 1],
+        2: [0, 0, 1, 0],
+        3: [0, 0, 1, 1],
+        4: [0, 1, 0, 0],
+        5: [0, 1, 0, 1],
+        6: [0, 1, 1, 0],
+        7: [0, 1, 1, 1],
+        8: [1, 0, 0, 0],
+        9: [1, 0, 0, 1],
+        A: [1, 0, 1, 0],
+        B: [1, 0, 1, 1],
+        C: [1, 1, 0, 0],
+        D: [1, 1, 0, 1],
+        E: [1, 1, 1, 0],
+        F: [1, 1, 1, 1],
+      }[char] as BitArray)
+  );
 };
 
 export const toBitArray = (bitString: string) =>
@@ -23,33 +39,114 @@ export const toInt = (bits: BitArray): number => {
     .reduce((acc, curr) => acc + curr, 0);
 };
 
-export const parseLiteralValuePacket = (packet: string) => {
-  if (packet.length < 11 && packet.length % 5 !== 6)
-    throw new Error("Type 4 packet with unexpected length");
+type LiteralValuePacket = {
+  type: "literal";
+  version: number;
+  value: number;
+};
+
+type OperatorPacket = {
+  type: "operator";
+  version: number;
+  children: Array<Packet>;
+};
+
+type Packet = LiteralValuePacket | OperatorPacket;
+
+export const parseLiteralValuePacket = (
+  transmission: string,
+  startingPointer = 0
+): {
+  packet: LiteralValuePacket;
+  pointer: number;
+} => {
+  const packet = transmission.slice(startingPointer);
   if (packet.slice(3, 6) !== "100") throw new Error("Type ID is not 4");
   const bits = toBitArray(packet);
   let lastBitGroup = false;
-  let pointer = 6; // first non-header bit position
+  let relativePointer = 6; // first non-header bit position
   const literalValueBits: BitArray = [];
   while (!lastBitGroup) {
-    lastBitGroup = bits[pointer] === 0;
-    literalValueBits.push(bits[pointer + 1]);
-    literalValueBits.push(bits[pointer + 2]);
-    literalValueBits.push(bits[pointer + 3]);
-    literalValueBits.push(bits[pointer + 4]);
-    pointer += 5;
+    lastBitGroup = bits[relativePointer] === 0;
+    literalValueBits.push(bits[relativePointer + 1]);
+    literalValueBits.push(bits[relativePointer + 2]);
+    literalValueBits.push(bits[relativePointer + 3]);
+    literalValueBits.push(bits[relativePointer + 4]);
+    relativePointer += 5;
   }
   return {
-    version: toInt(toBitArray(packet.slice(0, 3))),
-    value: toInt(literalValueBits),
+    packet: {
+      type: "literal",
+      version: toInt(toBitArray(packet.slice(0, 3))),
+      value: toInt(literalValueBits),
+    },
+    pointer: startingPointer + relativePointer,
   };
 };
 
-export const parseOperatorPacket = (bits: BitArray) => {
-  // TODO
+export const parseOperatorPacket = (
+  transmission: string,
+  startingPointer = 0
+): { packet: OperatorPacket; pointer: number } => {
+  const packet = transmission.slice(startingPointer);
+  const bits = toBitArray(packet);
+
+  const lengthType = bits[6] === 0 ? "bits" : "packets";
+
+  const endOfLengthInfo = lengthType === "bits" ? 22 : 18;
+
+  const length = toInt(bits.slice(7, endOfLengthInfo));
+
+  let relativePointer = endOfLengthInfo;
+  const children: Array<Packet> = [];
+
+  while (
+    (lengthType === "bits"
+      ? relativePointer - endOfLengthInfo // bits consumed so far
+      : children.length) < length // subpackets consumed so far
+  ) {
+    const { packet: child, pointer: newPointer } = parsePacket(
+      transmission,
+      startingPointer + relativePointer
+    );
+    children.push(child);
+    relativePointer = newPointer - startingPointer;
+  }
+
+  return {
+    packet: {
+      type: "operator",
+      version: toInt(bits.slice(0, 3)),
+      children,
+    },
+    pointer: startingPointer + relativePointer,
+  };
+};
+
+export const parsePacket = (
+  transmission: string,
+  startingPointer = 0
+): { packet: Packet; pointer: number } => {
+  const type = toInt(
+    toBitArray(transmission.slice(startingPointer + 3, startingPointer + 6))
+  );
+
+  if (type === 4) return parseLiteralValuePacket(transmission, startingPointer);
+  return parseOperatorPacket(transmission, startingPointer);
+};
+
+const countVersion = (packet: Packet): number => {
+  if (packet.type === "literal") return packet.version;
+  return (
+    packet.version +
+    packet.children
+      .map((child) => countVersion(child))
+      .reduce((acc, curr) => acc + curr, 0)
+  );
 };
 
 export const solvePart1 = (filePath: string): number => {
-  // TODO
-  return 0;
+  const hex = getInputStrings(filePath)[0];
+  const packetTree = parsePacket(hexToBitArray(hex).join("")).packet;
+  return countVersion(packetTree);
 };
