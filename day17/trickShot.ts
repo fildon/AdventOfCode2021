@@ -108,44 +108,37 @@ const getSmallestX = (targetXMin: number): number => {
   throw new Error("could not find x min");
 };
 
-export const solvePart1 = (filePath: string) => {
-  const target = parseInput(filePath);
+/**
+ * Returns an array of numbers between min and max (inclusive)
+ */
+const buildRange = (min: number, max: number): Array<number> =>
+  new Array(max - min + 1).fill(0).map((_, i) => min + i);
+
+const getSuccessfulProbes = (target: Area) => {
   const [xMin, yMin, xMax, _yMax] = target;
 
-  const xLowerBound = getSmallestX(xMin); // Would never get right enough
-  const xUpperBound = xMax; // Would shoot past to the right
-  const yLowerBound = yMin; // Would immediately shoot below target
-  const yUpperBound = -yMin; // Would shoot past target after falling past the horizontal
+  const xRange = buildRange(getSmallestX(xMin), xMax);
+  const yRange = buildRange(yMin, -yMin);
 
-  // Iterate down from the largest y value
-  for (let y = yUpperBound; y >= yLowerBound; y--) {
-    for (let x = xLowerBound; x <= xUpperBound; x++) {
-      const probe = buildProbe({ velocity: [x, y] });
-      // First probe that hits the target is also the highest such probe
-      if (hitsTarget(probe, target)) return getMaximumHeight(probe);
-    }
-  }
-  throw new Error("Failed to find a successful probe");
+  const probeCandidates = xRange.flatMap((x) =>
+    yRange.map((y) => buildProbe({ velocity: [x, y] }))
+  );
+
+  return probeCandidates.filter((probe) => hitsTarget(probe, target));
+};
+
+export const solvePart1 = (filePath: string) => {
+  const target = parseInput(filePath);
+
+  const successfulProbes = getSuccessfulProbes(target);
+  if (successfulProbes.length === 0)
+    throw new Error("Failed to find a successful probe");
+  return successfulProbes
+    .map((probe) => getMaximumHeight(probe))
+    .reduce((acc, curr) => Math.max(acc, curr), -Infinity);
 };
 
 export const solvePart2 = (filePath: string): number => {
   const target = parseInput(filePath);
-  const [xMin, yMin, xMax, _yMax] = target;
-
-  const xLowerBound = getSmallestX(xMin); // Would never get right enough
-  const xUpperBound = xMax; // Would shoot past to the right
-  const yLowerBound = yMin; // Would immediately shoot below target
-  const yUpperBound = -yMin; // Would shoot past target after falling past the horizontal
-
-  let successfulProbes = 0;
-
-  // Iterate down from the largest y value
-  for (let y = yUpperBound; y >= yLowerBound; y--) {
-    for (let x = xLowerBound; x <= xUpperBound; x++) {
-      const probe = buildProbe({ velocity: [x, y] });
-      if (hitsTarget(probe, target)) successfulProbes++;
-    }
-  }
-
-  return successfulProbes;
+  return getSuccessfulProbes(target).length;
 };
