@@ -8,11 +8,13 @@ import {
   inArea,
   hitsTarget,
   getMaximumHeight,
+  getXCandidates,
+  solvePart1,
 } from "./trickShot.ts";
 
 Deno.test("day17/parses input", () => {
-  assertEquals(parseInput("day17/testinput.txt"), [20, 30, -10, -5]);
-  assertEquals(parseInput("day17/input.txt"), [248, 285, -85, -56]);
+  assertEquals(parseInput("day17/testinput.txt"), [20, -10, 30, -5]);
+  assertEquals(parseInput("day17/input.txt"), [248, -85, 285, -56]);
 });
 
 Deno.test("day17/advances probe", () => {
@@ -66,4 +68,17 @@ Deno.test("day17/hits target", () => {
 Deno.test("day17/finds highest point of probe", () => {
   const maximumHeight = getMaximumHeight(buildProbe({ velocity: [6, 9] }));
   assertEquals(maximumHeight, 45);
+});
+
+Deno.test("day17/gets x candidates", () => {
+  assertEquals(getXCandidates([5, 0, 7, 0]), [3, 5, 6, 7]);
+});
+
+Deno.test({
+  name: "day17/solves part 1",
+  ignore: false,
+  fn: () => {
+    assertEquals(solvePart1("day17/testinput.txt"), 45);
+    assertEquals(solvePart1("day17/input.txt"), 3570);
+  },
 });
