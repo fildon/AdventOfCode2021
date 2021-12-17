@@ -108,74 +108,44 @@ const getSmallestX = (targetXMin: number): number => {
   throw new Error("could not find x min");
 };
 
-/**
- * Given a target area, returns the array of x velocities that could ever
- * coincide with that target
- */
-export const getXCandidates = (target: Area): Array<number> => {
-  const [xMin, _yMin, xMax, _yMax] = target;
-  // Start by finding very dumb bounds (inclusive)
-  const xLowerBound = getSmallestX(xMin);
-  const xUpperBound = xMax;
-
-  const xCandidates: Array<number> = [];
-  // For each value within our dumb bounds we check if they ever enter the target x range
-  for (let xStartVel = xLowerBound; xStartVel <= xUpperBound; xStartVel++) {
-    // xHits tracks all x values visited by this xStartVel
-    const xHits = [xStartVel];
-    let xVel = xStartVel;
-    // While xVel is positive we simulate x increasing by xVel
-    while (xVel > 0) {
-      xHits.push(xHits[xHits.length - 1] + xVel);
-      xVel--;
-    }
-    // This is a valid candidate if the xHits includes a member within the target
-    if (xHits.some((hit) => xMin <= hit && hit <= xMax))
-      xCandidates.push(xStartVel);
-  }
-  return xCandidates;
-};
-
-const getYCandidates = (target: Area): Array<number> => {
-  const [_xMin, yMin, _xMax, yMax] = target;
-
-  // Dumb bounds (Inclusive)
-  const lowerBound = yMin; // Would immediately shoot below target
-  const upperBound = -yMin; // Would shoot past target after falling past the horizontal
-  // WARNING the above assumes yMin is negative
-
-  const yCandidates: Array<number> = [];
-  for (let yStartVel = lowerBound; yStartVel < upperBound; yStartVel++) {
-    // yHits tracks all y values visited by this yStartVel
-    const yHits = [yStartVel];
-    let yVel = yStartVel - 1;
-    // While we haven't passed the target we add another value
-    while (yHits[yHits.length - 1] >= yMin) {
-      yHits.push(yHits[yHits.length - 1] + yVel);
-      yVel--;
-    }
-    // This is a valid candidate if the yHits includes a member within the target
-    if (yHits.some((hit) => yMin <= hit && hit <= yMax))
-      yCandidates.push(yStartVel);
-  }
-  return yCandidates;
-};
-
 export const solvePart1 = (filePath: string) => {
   const target = parseInput(filePath);
+  const [xMin, yMin, xMax, _yMax] = target;
 
-  // We define bounds for our search space
-  const xCandidates = getXCandidates(target);
-  // Sort y candidates in descending order, to put largest values first
-  const yCandidates = getYCandidates(target).sort((a, b) => b - a);
+  const xLowerBound = getSmallestX(xMin); // Would never get right enough
+  const xUpperBound = xMax; // Would shoot past to the right
+  const yLowerBound = yMin; // Would immediately shoot below target
+  const yUpperBound = -yMin; // Would shoot past target after falling past the horizontal
 
-  // Iterate down from the largest y values
-  for (const y of yCandidates) {
-    for (const x of xCandidates) {
+  // Iterate down from the largest y value
+  for (let y = yUpperBound; y >= yLowerBound; y--) {
+    for (let x = xLowerBound; x <= xUpperBound; x++) {
       const probe = buildProbe({ velocity: [x, y] });
-      // First probe that hits the target is also the highest such probe (thanks to yCandidate ordering)
+      // First probe that hits the target is also the highest such probe
       if (hitsTarget(probe, target)) return getMaximumHeight(probe);
     }
   }
   throw new Error("Failed to find a successful probe");
+};
+
+export const solvePart2 = (filePath: string): number => {
+  const target = parseInput(filePath);
+  const [xMin, yMin, xMax, _yMax] = target;
+
+  const xLowerBound = getSmallestX(xMin); // Would never get right enough
+  const xUpperBound = xMax; // Would shoot past to the right
+  const yLowerBound = yMin; // Would immediately shoot below target
+  const yUpperBound = -yMin; // Would shoot past target after falling past the horizontal
+
+  let successfulProbes = 0;
+
+  // Iterate down from the largest y value
+  for (let y = yUpperBound; y >= yLowerBound; y--) {
+    for (let x = xLowerBound; x <= xUpperBound; x++) {
+      const probe = buildProbe({ velocity: [x, y] });
+      if (hitsTarget(probe, target)) successfulProbes++;
+    }
+  }
+
+  return successfulProbes;
 };
