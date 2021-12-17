@@ -2,7 +2,13 @@ import {
   assert,
   assertEquals,
 } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { parseInput, buildProbe, inArea, hitsTarget } from "./trickShot.ts";
+import {
+  parseInput,
+  buildProbe,
+  inArea,
+  hitsTarget,
+  getMaximumHeight,
+} from "./trickShot.ts";
 
 Deno.test("day17/parses input", () => {
   assertEquals(parseInput("day17/testinput.txt"), [20, 30, -10, -5]);
@@ -47,11 +53,17 @@ Deno.test("day17/hits target", () => {
   const probeB = buildProbe({ velocity: [6, 3] });
   const probeC = buildProbe({ velocity: [9, 0] });
   const probeD = buildProbe({ velocity: [17, -4] });
+  const target = [20, -10, 30, -5] as const;
 
   // Probes A, B and C all hit the target
-  assert(hitsTarget(probeA, [20, -10, 30, -5]));
-  assert(hitsTarget(probeB, [20, -10, 30, -5]));
-  assert(hitsTarget(probeC, [20, -10, 30, -5]));
+  assert(hitsTarget(probeA, target));
+  assert(hitsTarget(probeB, target));
+  assert(hitsTarget(probeC, target));
   // Probe D does not hit the target
-  assert(!hitsTarget(probeD, [20, -10, 30, -5]));
+  assert(!hitsTarget(probeD, target));
+});
+
+Deno.test("day17/finds highest point of probe", () => {
+  const maximumHeight = getMaximumHeight(buildProbe({ velocity: [6, 9] }));
+  assertEquals(maximumHeight, 45);
 });

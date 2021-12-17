@@ -3,12 +3,12 @@ import { getInputStrings } from "../utils/inputparsing.ts";
 /**
  * 2D vector of the form: `[x, y]`
  */
-type Vector = [number, number];
+type Vector = readonly [number, number];
 
 /**
  * Rectangular area bounded by `[xMin, yMin, xMax, yMax]`
  */
-type Area = [number, number, number, number];
+type Area = readonly [number, number, number, number];
 
 type Probe = {
   position: Vector;
@@ -71,4 +71,12 @@ export const hitsTarget = (probe: Probe, target: Area): boolean => {
   if (inArea(probe.position, target)) return true;
   // Otherwise we advance the probe and recheck
   return hitsTarget(probe.advance(), target);
+};
+
+export const getMaximumHeight = (probe: Probe) => {
+  const [, yVelocity] = probe.velocity;
+  const [, yPosition] = probe.position;
+  if (yVelocity <= 0) return yPosition;
+  // Summation over a descending integer is equivalent to a triangular number
+  return yPosition + 0.5 * yVelocity * (yVelocity + 1);
 };
