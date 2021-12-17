@@ -62,3 +62,13 @@ export const buildProbe = ({
 
 export const inArea = ([x, y]: Vector, [xMin, yMin, xMax, yMax]: Area) =>
   xMin <= x && x <= xMax && yMin <= y && y <= yMax;
+
+export const hitsTarget = (probe: Probe, target: Area): boolean => {
+  const [, yMin] = target;
+  // If probe is below target and descending, then it has missed
+  if (probe.position[1] < yMin && probe.velocity[1] <= 0) return false;
+  // Probe is currently in target area, it has succeeded!
+  if (inArea(probe.position, target)) return true;
+  // Otherwise we advance the probe and recheck
+  return hitsTarget(probe.advance(), target);
+};
