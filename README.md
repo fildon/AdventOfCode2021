@@ -33,3 +33,9 @@ all tests with:
 ```shell
 npm t
 ```
+
+Or if you like to run them in watch mode:
+
+```shell
+npm t -- --watch
+```
