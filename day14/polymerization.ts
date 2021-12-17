@@ -9,7 +9,7 @@ export const parseInput = (inputLines: Array<string>) => {
     })
     .reduce(
       (acc, pair) => ({ ...acc, [pair]: (acc[pair] ?? 0) + 1 }),
-      {} as { [pair: string]: number }
+      {} as { [pair: string]: number },
     );
   const rules = Object.fromEntries(
     inputLines
@@ -18,7 +18,7 @@ export const parseInput = (inputLines: Array<string>) => {
         const last = line.at(-1);
         if (!last) throw new Error("Unexpected empty line");
         return [line.slice(0, 2), last];
-      })
+      }),
   );
   const letterCounts = [...template].reduce((acc, curr) => {
     return { ...acc, [curr]: (acc[curr] ?? 0) + 1 };
@@ -29,7 +29,7 @@ export const parseInput = (inputLines: Array<string>) => {
 export const stepOnce = (
   pairs: { [pair: string]: number },
   rules: { [pair: string]: string },
-  letterCounts: { [letter: string]: number }
+  letterCounts: { [letter: string]: number },
 ) => {
   const newPairs = {} as { [pair: string]: number };
   const newLetterCounts = { ...letterCounts };
@@ -54,7 +54,7 @@ export const stepN = (
   pairs: { [pair: string]: number },
   rules: { [pair: string]: string },
   counts: { [letter: string]: number },
-  steps: number
+  steps: number,
 ) => {
   let workingCounts = { ...counts };
   let workingPairs = { ...pairs };
@@ -62,7 +62,7 @@ export const stepN = (
     const { pairs, letterCounts } = stepOnce(
       workingPairs,
       rules,
-      workingCounts
+      workingCounts,
     );
     workingPairs = pairs;
     workingCounts = letterCounts;

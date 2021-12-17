@@ -1,12 +1,12 @@
 import { getInputStrings } from "../utils/inputparsing.ts";
 import {
+  InvalidResult,
   parseInputLine,
   part1GetScore,
-  InvalidResult,
 } from "./bracketParsing.ts";
 
 const inputLines = getInputStrings("day10/input.txt").filter(
-  (line) => line.length > 0
+  (line) => line.length > 0,
 );
 const corruptions = inputLines
   .map(parseInputLine)

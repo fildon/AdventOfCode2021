@@ -1,9 +1,9 @@
 import type { Board } from "./types.ts";
 import {
-  parseInput,
   applyNumberToBoards,
   findWinner,
   getScore,
+  parseInput,
 } from "./utils.ts";
 
 /**
@@ -11,7 +11,7 @@ import {
  */
 const playUntilWinner = (
   incomingNumbers: Array<number>,
-  boards: Array<Board>
+  boards: Array<Board>,
 ): number => {
   const [numberToApply, ...remainingNumbers] = incomingNumbers;
   const newBoards = applyNumberToBoards(boards, numberToApply);

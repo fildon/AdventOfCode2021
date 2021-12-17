@@ -1,13 +1,13 @@
 import { getInputStrings } from "../utils/inputparsing.ts";
 import {
+  getMedianValue,
   parseInputLine,
   part2GetScoreOfLine,
   ValidResult,
-  getMedianValue,
 } from "./bracketParsing.ts";
 
 const inputLines = getInputStrings("day10/input.txt").filter(
-  (line) => line.length > 0
+  (line) => line.length > 0,
 );
 const completionSequences = inputLines
   .map(parseInputLine)

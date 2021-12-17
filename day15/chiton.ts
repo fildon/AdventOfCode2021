@@ -30,7 +30,7 @@ type Path = {
 };
 
 const buildLocationCostMap = (
-  primativeMap: { [x: number]: { [y: number]: number } } = {}
+  primativeMap: { [x: number]: { [y: number]: number } } = {},
 ) => {
   return {
     get: ([x, y]: Location) => primativeMap[x]?.[y] ?? Infinity,
@@ -85,12 +85,13 @@ const aStarSearch = (riskMap: number[][]) => {
         gScore = gScore.set(neighbour, tentativeGScore);
         fScore = fScore.set(
           neighbour,
-          tentativeGScore + hCost(neighbour, goal)
+          tentativeGScore + hCost(neighbour, goal),
         );
 
         // Only add this neighbour if it is not already in our openSet
-        if (!openSet.some(([x, y]) => x === neighbourX && y === neighbourY))
+        if (!openSet.some(([x, y]) => x === neighbourX && y === neighbourY)) {
           openSet.push(neighbour);
+        }
       }
     });
   }

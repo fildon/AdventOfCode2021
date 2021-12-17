@@ -20,7 +20,7 @@ export const buildDumboMap = (inputLines: Array<string>): DumboMap => {
 
 export const updateDumboAt = (
   dumboMap: DumboMap,
-  newDumbo: Dumbo
+  newDumbo: Dumbo,
 ): DumboMap => {
   return dumboMap.map((dumboRow, row) =>
     dumboRow.map((dumbo, col) =>
@@ -31,7 +31,7 @@ export const updateDumboAt = (
 
 const incrementDumboAt = (
   dumboMap: DumboMap,
-  { row, col }: { row: number; col: number }
+  { row, col }: { row: number; col: number },
 ): DumboMap => {
   const dumbo = dumboMap[row]?.[col];
   // This will only happen if you try to update a dumbo outside the map
@@ -48,7 +48,7 @@ export const incrementAll = (dumboMap: DumboMap): DumboMap => {
 
 export const getNeighbours = (
   dumboMap: DumboMap,
-  location: { row: number; col: number }
+  location: { row: number; col: number },
 ): Array<Dumbo> => {
   return dumboMap.flat().filter((dumbo) => {
     const rowDiff = Math.abs(dumbo.row - location.row);
@@ -68,36 +68,37 @@ export const flashWaveOnce = (dumboMap: DumboMap): DumboMap => {
 
   const mapAfterIncrements = toBeIncremented.reduce(
     (map, location) => incrementDumboAt(map, location),
-    dumboMap
+    dumboMap,
   );
 
   const mapAfterMarkingFlashers = flashers.reduce(
     (map, flasher) => updateDumboAt(map, { ...flasher, flashed: true }),
-    mapAfterIncrements
+    mapAfterIncrements,
   );
 
   return mapAfterMarkingFlashers;
 };
 
 export const resetFlashed = (
-  dumboMap: DumboMap
+  dumboMap: DumboMap,
 ): { dumboMap: DumboMap; flashCount: number } => {
   const flashed = dumboMap.flat().filter((dumbo) => dumbo.flashed);
   const resetMap = flashed.reduce(
     (map, dumbo) => updateDumboAt(map, { ...dumbo, energy: 0, flashed: false }),
-    dumboMap
+    dumboMap,
   );
   return { dumboMap: resetMap, flashCount: flashed.length };
 };
 
 const flashUntilDone = (dumboMap: DumboMap): DumboMap => {
-  if (dumboMap.flat().every(({ energy, flashed }) => energy < 10 || flashed))
+  if (dumboMap.flat().every(({ energy, flashed }) => energy < 10 || flashed)) {
     return dumboMap;
+  }
   return flashUntilDone(flashWaveOnce(dumboMap));
 };
 
 const stepOnce = (
-  dumboMap: DumboMap
+  dumboMap: DumboMap,
 ): { dumboMap: DumboMap; flashCount: number } => {
   const map = incrementAll(dumboMap);
 
@@ -109,7 +110,7 @@ const stepOnce = (
 export const stepN = (
   dumboMap: DumboMap,
   n: number,
-  flashCount = 0
+  flashCount = 0,
 ): number => {
   if (n < 1) return flashCount;
   const { dumboMap: newMap, flashCount: newFlashCount } = stepOnce(dumboMap);
@@ -118,7 +119,7 @@ export const stepN = (
 
 export const stepUntilAllFlashed = (
   dumboMap: DumboMap,
-  stepCount = 0
+  stepCount = 0,
 ): number => {
   if (dumboMap.flat().every((dumbo) => dumbo.energy === 0)) return stepCount;
   return stepUntilAllFlashed(stepOnce(dumboMap).dumboMap, stepCount + 1);

@@ -1,11 +1,11 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
 import {
   buildDumboMap,
-  updateDumboAt,
   flashWaveOnce,
   getNeighbours,
   incrementAll,
   resetFlashed,
+  updateDumboAt,
 } from "./dumbo.ts";
 
 Deno.test("day11/Builds dumbo map from input", () => {
@@ -34,7 +34,7 @@ Deno.test("day11/Can update a dumbo in a map", () => {
           { energy: 4, flashed: false, row: 1, col: 1 },
         ],
       ],
-      { energy: 5, flashed: true, row: 0, col: 0 }
+      { energy: 5, flashed: true, row: 0, col: 0 },
     ),
     [
       [
@@ -45,7 +45,7 @@ Deno.test("day11/Can update a dumbo in a map", () => {
         { energy: 3, flashed: false, row: 1, col: 0 },
         { energy: 4, flashed: false, row: 1, col: 1 },
       ],
-    ]
+    ],
   );
 });
 
@@ -69,7 +69,7 @@ Deno.test("day11/gets neighbours", () => {
           { energy: 9, flashed: false, row: 2, col: 2 },
         ],
       ],
-      { row: 0, col: 1 }
+      { row: 0, col: 1 },
     ),
     [
       { energy: 1, flashed: false, row: 0, col: 0 },
@@ -77,7 +77,7 @@ Deno.test("day11/gets neighbours", () => {
       { energy: 4, flashed: false, row: 1, col: 0 },
       { energy: 5, flashed: false, row: 1, col: 1 },
       { energy: 6, flashed: false, row: 1, col: 2 },
-    ]
+    ],
   );
 });
 
@@ -116,7 +116,7 @@ Deno.test("day11/runs a single flash wave", () => {
         { energy: 9, flashed: false, row: 2, col: 1 },
         { energy: 10, flashed: true, row: 2, col: 2 },
       ],
-    ]
+    ],
   );
   assertEquals(
     flashWaveOnce([
@@ -132,7 +132,7 @@ Deno.test("day11/runs a single flash wave", () => {
         { energy: 3, flashed: true, row: 0, col: 1 },
         { energy: 10, flashed: true, row: 0, col: 2 },
       ],
-    ]
+    ],
   );
   assertEquals(
     flashWaveOnce([
@@ -146,7 +146,7 @@ Deno.test("day11/runs a single flash wave", () => {
         { energy: 1, flashed: false, row: 0, col: 0 },
         { energy: 10, flashed: true, row: 0, col: 1 },
       ],
-    ]
+    ],
   );
 });
 
@@ -185,7 +185,7 @@ Deno.test("day11/increments all", () => {
         { energy: 9, flashed: false, row: 2, col: 1 },
         { energy: 10, flashed: false, row: 2, col: 2 },
       ],
-    ]
+    ],
   );
 });
 
@@ -205,6 +205,6 @@ Deno.test("day11/resets flashers", () => {
         ],
       ],
       flashCount: 1,
-    }
+    },
   );
 });

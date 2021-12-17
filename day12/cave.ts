@@ -4,13 +4,13 @@ type Edges = Set<[string, string]>;
 
 export const buildEdges = (
   inputStrings: Array<string>,
-  edges: Edges = new Set()
+  edges: Edges = new Set(),
 ): Set<[string, string]> => {
   if (inputStrings.length === 0) return edges;
   const [head, ...tail] = inputStrings;
   const edgePair = head.split("-").sort((a, b) => a.localeCompare(b)) as [
     string,
-    string
+    string,
   ];
   return buildEdges(tail, edges.add(edgePair));
 };
@@ -24,7 +24,7 @@ type Path = Array<string>;
 
 export const findPaths = (
   edges: Edges,
-  nodeValidator: (node: string, currentPath: Path) => boolean
+  nodeValidator: (node: string, currentPath: Path) => boolean,
 ): Set<Path> => {
   const partialPaths: Array<Path> = [["start"]];
   const completedPaths: Set<Path> = new Set();
@@ -63,7 +63,7 @@ const part1Validator = (node: string, currentPath: Path) => {
 
 export const solvePart1 = (filePath: string) => {
   const inputStrings = getInputStrings(filePath).filter(
-    (str) => str.length > 0
+    (str) => str.length > 0,
   );
   const edges = buildEdges(inputStrings);
   const paths = findPaths(edges, part1Validator);
@@ -91,7 +91,7 @@ const part2Validator = (node: string, currentPath: Path) => {
 
 export const solvePart2 = (filePath: string) => {
   const inputStrings = getInputStrings(filePath).filter(
-    (str) => str.length > 0
+    (str) => str.length > 0,
   );
   const edges = buildEdges(inputStrings);
   const paths = findPaths(edges, part2Validator);

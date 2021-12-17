@@ -28,7 +28,7 @@ const costToMoveFromTo = (position: number, target: number) => {
  */
 const getLocalCostGradient = (
   numbers: Array<number>,
-  currentPosition: number
+  currentPosition: number,
 ) => {
   const up = numbers
     .map((num) => costToMoveFromTo(num, currentPosition + 1))

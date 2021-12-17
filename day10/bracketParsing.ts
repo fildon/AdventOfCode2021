@@ -24,10 +24,12 @@ export const parseInputLine = (inputLine: string): ParseResult => {
     if (isOpener(currentSymbol)) bracketStack.push(currentSymbol);
     if (isCloser(currentSymbol)) {
       const matches = bracketStack.pop();
-      if (matches === undefined)
+      if (matches === undefined) {
         throw new Error("Closed chunk with no available openers");
-      if (openToCloseLookup[matches] !== currentSymbol)
+      }
+      if (openToCloseLookup[matches] !== currentSymbol) {
         return { valid: false, illegalSymbol: currentSymbol };
+      }
     }
   }
   return {
@@ -57,11 +59,11 @@ const part2ScoreLookup: Record<Closer, number> = {
   ">": 4,
 };
 export const part2GetScoreOfLine = (
-  completionSequence: Array<Closer>
+  completionSequence: Array<Closer>,
 ): number => {
   return completionSequence.reduce(
     (acc, curr) => 5 * acc + part2ScoreLookup[curr],
-    0
+    0,
   );
 };
 

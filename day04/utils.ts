@@ -6,19 +6,21 @@ const toBoardRow = (rowString: string): BoardRow => {
     .filter((str) => str.length > 0)
     .map((str) => parseInt(str))
     .map((num) => ({ value: num, marked: false }));
-  if (boardRow.length !== 5)
+  if (boardRow.length !== 5) {
     throw new Error(
-      `Parse error: unexpected row width. Row string was: ${rowString}`
+      `Parse error: unexpected row width. Row string was: ${rowString}`,
     );
+  }
   return boardRow as BoardRow;
 };
 
 const toBoard = (boardString: Array<string>): Board => {
   const rows = boardString.map(toBoardRow);
-  if (rows.length !== 5)
+  if (rows.length !== 5) {
     throw new Error(
-      `Parse error: unexpected board height. Board string was: ${boardString}`
+      `Parse error: unexpected board height. Board string was: ${boardString}`,
     );
+  }
   return rows as Board;
 };
 
@@ -29,7 +31,7 @@ export const parseInput = async (filePath: string) => {
   const incomingNumbers = inputParts[0].split(",").map((str) => parseInt(str));
 
   const boardStream = inputParts.filter(
-    (line, index) => index > 0 && line.length > 0
+    (line, index) => index > 0 && line.length > 0,
   );
   const boardStrings: Array<Array<string>> = [];
   let startIndex = 0;
@@ -73,7 +75,7 @@ const applyNumberToRow = (row: BoardRow, numberToMark: number): BoardRow => {
 
 export const applyNumberToBoard = (
   board: Board,
-  numberToMark: number
+  numberToMark: number,
 ): Board => {
   const newBoard = board.map((row) => applyNumberToRow(row, numberToMark));
   return newBoard as Board;
@@ -81,7 +83,7 @@ export const applyNumberToBoard = (
 
 export const applyNumberToBoards = (
   boards: Array<Board>,
-  numberToMark: number
+  numberToMark: number,
 ): Array<Board> => {
   return boards.map((board) => applyNumberToBoard(board, numberToMark));
 };

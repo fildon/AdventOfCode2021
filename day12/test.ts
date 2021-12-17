@@ -8,7 +8,7 @@ Deno.test("day12/part1/buildEdges", () => {
     new Set([
       ["a", "b"],
       ["c", "d"],
-    ])
+    ]),
   );
   // Same as above but one edge reversed
   // To test that 'direction' of an edge doesn't matter
@@ -17,7 +17,7 @@ Deno.test("day12/part1/buildEdges", () => {
     new Set([
       ["a", "b"],
       ["c", "d"],
-    ])
+    ]),
   );
 });
 
@@ -35,7 +35,7 @@ Deno.test("day12/part1/findPaths", () => {
         ["b", "start"],
       ]),
       (node, currentPath) =>
-        node.toUpperCase() === node || !currentPath.includes(node)
+        node.toUpperCase() === node || !currentPath.includes(node),
     ),
     new Set([
       ["start", "A", "b", "A", "c", "A", "end"],
@@ -48,7 +48,7 @@ Deno.test("day12/part1/findPaths", () => {
       ["start", "b", "A", "c", "A", "end"],
       ["start", "b", "A", "end"],
       ["start", "b", "end"],
-    ])
+    ]),
   );
 });
 

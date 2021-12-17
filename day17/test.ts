@@ -3,11 +3,11 @@ import {
   assertEquals,
 } from "https://deno.land/std@0.117.0/testing/asserts.ts";
 import {
-  parseInput,
   buildProbe,
-  inArea,
-  hitsTarget,
   getMaximumHeight,
+  hitsTarget,
+  inArea,
+  parseInput,
   solvePart1,
   solvePart2,
 } from "./trickShot.ts";

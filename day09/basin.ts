@@ -34,7 +34,7 @@ const getRiskAtCoordinate = (map: Map, coordinate: [number, number]) => {
 
 export const getRiskOfLowPoints = () => {
   const map = buildMapFromStrings(
-    getInputStrings("day09/input.txt").filter((line) => line.length > 0)
+    getInputStrings("day09/input.txt").filter((line) => line.length > 0),
   );
   const lowPoints = getLowPointCoordinates(map);
   const risks = lowPoints.map((lowPoint) => getRiskAtCoordinate(map, lowPoint));
@@ -44,7 +44,7 @@ export const getRiskOfLowPoints = () => {
 const getBasinSizeRecursive = (
   map: Map,
   checked: Array<[number, number]>,
-  toCheck: Array<[number, number]>
+  toCheck: Array<[number, number]>,
 ): number => {
   if (toCheck.length === 0) return checked.length;
   const [next, ...waiting] = toCheck;
@@ -71,7 +71,7 @@ const getBasinSizeRecursive = (
   return getBasinSizeRecursive(
     map,
     [next, ...checked],
-    [...candidates, ...waiting]
+    [...candidates, ...waiting],
   );
 };
 
@@ -86,7 +86,7 @@ const getBasinSizes = (map: Map) => {
 
 export const getProductOfThreeLargestBasins = () => {
   const map = buildMapFromStrings(
-    getInputStrings("day09/input.txt").filter((line) => line.length > 0)
+    getInputStrings("day09/input.txt").filter((line) => line.length > 0),
   );
   const basinSizes = getBasinSizes(map);
   // Sort descending by value, i.e. biggest first

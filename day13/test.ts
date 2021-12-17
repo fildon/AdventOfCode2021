@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { parseInput, foldPoints, solvePart1, solvePart2 } from "./origami.ts";
+import { foldPoints, parseInput, solvePart1, solvePart2 } from "./origami.ts";
 
 Deno.test("day13/parses input", () => {
   assertEquals(
@@ -55,7 +55,7 @@ Deno.test("day13/parses input", () => {
         },
         { type: "x", value: 5 },
       ],
-    }
+    },
   );
 });
 
@@ -69,14 +69,14 @@ Deno.test("day13/folds points", () => {
         [6, 6],
         [7, 3],
       ],
-      { type: "x", value: 4 }
+      { type: "x", value: 4 },
     ),
     [
       [1, 1],
       [2, 7],
       [2, 6],
       [1, 3],
-    ]
+    ],
   );
   assertEquals(
     foldPoints(
@@ -86,14 +86,14 @@ Deno.test("day13/folds points", () => {
         [6, 6],
         [9, 3],
       ],
-      { type: "y", value: 5 }
+      { type: "y", value: 5 },
     ),
     [
       [1, 1],
       [2, 3],
       [6, 4],
       [9, 3],
-    ]
+    ],
   );
 });
 
@@ -112,6 +112,6 @@ Deno.test("day13/solve part 2", () => {
       "████ █  █ █ █     █ █    █  █ █ ██ █   ",
       "█  █ █  █ █ █  █  █ █    █  █ █  █ █  █",
       "█  █ ███  █  █  ██  █    ███   ███  ██ ",
-    ].join("\n")
+    ].join("\n"),
   );
 });

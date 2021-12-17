@@ -6,7 +6,7 @@ export const parseInput = (inputLines: Array<string>) => {
   const foldLines = nonEmptyStrs.filter((str) => str.includes("fold"));
   return {
     points: pointLines.map(
-      (str) => str.split(",").map((n) => parseInt(n)) as [number, number]
+      (str) => str.split(",").map((n) => parseInt(n)) as [number, number],
     ),
     folds: foldLines.map((str) => ({
       type: (str.includes("x") ? "x" : "y") as "x" | "y",
@@ -17,7 +17,7 @@ export const parseInput = (inputLines: Array<string>) => {
 
 const foldPoint = (
   [x, y]: [number, number],
-  { type, value }: { type: "x" | "y"; value: number }
+  { type, value }: { type: "x" | "y"; value: number },
 ) => {
   if (type === "x") {
     if (x < value) return [x, y];
@@ -30,13 +30,13 @@ const foldPoint = (
 
 export const foldPoints = (
   points: Array<[number, number]>,
-  foldInstruction: { type: "x" | "y"; value: number }
+  foldInstruction: { type: "x" | "y"; value: number },
 ) => {
   const folded = points.map((point) => foldPoint(point, foldInstruction));
   const uniquePointStrings = new Set(folded.map(([x, y]) => `${x},${y}`));
   return [...uniquePointStrings.values()].map(
     (pointString) =>
-      pointString.split(",").map((s) => parseInt(s)) as [number, number]
+      pointString.split(",").map((s) => parseInt(s)) as [number, number],
   );
 };
 
@@ -50,7 +50,7 @@ export const solvePart1 = (filePath: string) => {
 const drawRow = (
   points: Array<[number, number]>,
   rowIndex: number,
-  width: number
+  width: number,
 ) => {
   return new Array(width)
     .fill("")
@@ -65,7 +65,7 @@ const drawRow = (
 const drawPoints = (points: Array<[number, number]>) => {
   const [xRange, yRange] = points.reduce(
     ([maxX, maxY], [x, y]) => [Math.max(maxX, x), Math.max(maxY, y)],
-    [0, 0]
+    [0, 0],
   );
   return new Array(yRange + 1)
     .fill([])
@@ -79,7 +79,7 @@ export const solvePart2 = () => {
 
   const folded = folds.reduce(
     (foldedPoints, fold) => foldPoints(foldedPoints, fold),
-    points
+    points,
   );
 
   return drawPoints(folded);

@@ -4,28 +4,97 @@ import {
 } from "https://deno.land/std@0.117.0/testing/asserts.ts";
 import {
   hexToBitArray,
-  toBitArray,
-  toInt,
   parseLiteralValuePacket,
   parseOperatorPacket,
   parsePacket,
   solvePart1,
-  solvePart2Hex,
   solvePart2,
+  solvePart2Hex,
+  toBitArray,
+  toInt,
 } from "./packet.ts";
 
 Deno.test("day16/converts hex to binary", () => {
   assertEquals(
     hexToBitArray("D2FE28"),
-    [1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0]
+    [1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0],
   );
   assertEquals(
     hexToBitArray("8A004A801A8002F478"),
     [
-      1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0,
-    ]
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+    ],
   );
 });
 
@@ -83,7 +152,7 @@ Deno.test({
   fn: () => {
     assertEquals(
       parseOperatorPacket(
-        "00111000000000000110111101000101001010010001001000000000"
+        "00111000000000000110111101000101001010010001001000000000",
       ),
       {
         packet: {
@@ -99,7 +168,7 @@ Deno.test({
           ],
         },
         pointer: 49,
-      }
+      },
     );
     assertEquals(parsePacket(hexToBitArray("8A004A801A8002F478").join("")), {
       packet: {
@@ -169,7 +238,7 @@ Deno.test({
           ],
         },
         pointer: 102,
-      }
+      },
     );
     assertEquals(
       parsePacket(hexToBitArray("C0015000016115A2E0802F182340").join("")),
@@ -213,7 +282,7 @@ Deno.test({
           ],
         },
         pointer: 106,
-      }
+      },
     );
     assertEquals(
       parsePacket(hexToBitArray("A0016C880162017C3686B18A3D4780").join("")),
@@ -262,7 +331,7 @@ Deno.test({
           ],
         },
         pointer: 113,
-      }
+      },
     );
   },
 });

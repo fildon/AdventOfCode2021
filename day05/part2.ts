@@ -51,7 +51,7 @@ const getCoordinatesAlongPath = ([start, end]: Path): Array<Coordinate> => {
 
 const solve = (filePath: string) => {
   const inputStrings = getInputStrings(filePath).filter(
-    (str) => str.length > 0
+    (str) => str.length > 0,
   );
   const paths = parsePaths(inputStrings);
   const { x: maxX, y: maxY } = paths.flat().reduce(
@@ -59,7 +59,7 @@ const solve = (filePath: string) => {
       x: Math.max(acc.x, curr.x),
       y: Math.max(acc.y, curr.y),
     }),
-    { x: 0, y: 0 }
+    { x: 0, y: 0 },
   );
   const diagram = createDiagram(maxX, maxY);
   const coordsToPaint = paths.map(getCoordinatesAlongPath).flat();

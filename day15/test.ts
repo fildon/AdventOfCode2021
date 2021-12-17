@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { parseInput, hCost, solvePart1, solvePart2 } from "./chiton.ts";
+import { hCost, parseInput, solvePart1, solvePart2 } from "./chiton.ts";
 
 const exampleRiskMap = [
   [1, 1, 6, 3, 7, 5, 1, 7, 4, 2],
@@ -28,7 +28,7 @@ Deno.test("day15/parses risk map", () => {
       "1293138521",
       "2311944581",
     ]),
-    exampleRiskMap
+    exampleRiskMap,
   );
 });
 

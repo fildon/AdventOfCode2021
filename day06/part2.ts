@@ -13,7 +13,7 @@ type FishCollection = [
   number,
   number,
   number,
-  number
+  number,
 ];
 
 const parseInput = (filePath: string): FishCollection => {
@@ -27,7 +27,7 @@ const parseInput = (filePath: string): FishCollection => {
   return Array(9)
     .fill(null)
     .map(
-      (_, index) => fishArray.filter((age) => age === index).length
+      (_, index) => fishArray.filter((age) => age === index).length,
     ) as FishCollection;
 };
 
@@ -49,7 +49,7 @@ const stepOneDay = (fishCollection: FishCollection): FishCollection => [
 
 const stepNDays = (
   fishCollection: FishCollection,
-  days: number
+  days: number,
 ): FishCollection =>
   days <= 0 ? fishCollection : stepNDays(stepOneDay(fishCollection), days - 1);
 

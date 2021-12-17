@@ -1,8 +1,8 @@
 import {
   buildMapFromStrings,
-  getRiskOfLowPoints,
   getBasinSize,
   getProductOfThreeLargestBasins,
+  getRiskOfLowPoints,
 } from "./basin.ts";
 
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
@@ -31,9 +31,9 @@ Deno.test("day09/part2 - getBasinSize", () => {
         [8, 7, 6, 7, 8, 9, 6, 7, 8, 9],
         [9, 8, 9, 9, 9, 6, 5, 6, 7, 8],
       ],
-      [0, 9]
+      [0, 9],
     ),
-    9
+    9,
   );
 });
 

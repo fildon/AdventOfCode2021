@@ -32,19 +32,19 @@ const getValuesAtPosition = (bitArrays: Array<BitArray>, position: number) =>
       {
         zeroes: 0,
         ones: 0,
-      }
+      },
     );
 
 const getRatingByCriteria = (
   readings: Array<BitArray>,
   criteria: (bitCounts: { zeroes: number; ones: number }) => Bit,
-  columnIndex = 0
+  columnIndex = 0,
 ): BitArray => {
   if (readings.length === 1) return readings[0];
   const filteredReadings = readings.filter(
     (reading) =>
       reading[columnIndex] ===
-      criteria(getValuesAtPosition(readings, columnIndex))
+        criteria(getValuesAtPosition(readings, columnIndex)),
   );
   return getRatingByCriteria(filteredReadings, criteria, columnIndex + 1);
 };

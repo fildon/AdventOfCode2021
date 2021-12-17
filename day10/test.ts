@@ -1,10 +1,10 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
 
 import {
-  part1GetScore,
-  parseInputLine,
-  part2GetScoreOfLine,
   getMedianValue,
+  parseInputLine,
+  part1GetScore,
+  part2GetScoreOfLine,
 } from "./bracketParsing.ts";
 
 Deno.test("day10/part1 - getScore", () => {
@@ -61,16 +61,16 @@ Deno.test("day10/part2 - parseInputLine - valid cases", () => {
 Deno.test("day10/part2 - part2GetScoreOfLine", () => {
   assertEquals(
     part2GetScoreOfLine(["}", "}", "]", "]", ")", "}", ")", "]"]),
-    288957
+    288957,
   );
   assertEquals(part2GetScoreOfLine([")", "}", ">", "]", "}", ")"]), 5566);
   assertEquals(
     part2GetScoreOfLine(["}", "}", ">", "}", ">", ")", ")", ")", ")"]),
-    1480781
+    1480781,
   );
   assertEquals(
     part2GetScoreOfLine(["]", "]", "}", "}", "]", "}", "]", "}", ">"]),
-    995444
+    995444,
   );
   assertEquals(part2GetScoreOfLine(["]", ")", "}", ">"]), 294);
 });

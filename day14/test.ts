@@ -1,10 +1,10 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
 import {
   parseInput,
-  stepOnce,
-  stepN,
   solvePart1,
   solvePart2,
+  stepN,
+  stepOnce,
 } from "./polymerization.ts";
 
 Deno.test("day14/parses input", () => {
@@ -50,7 +50,7 @@ Deno.test("day14/parses input", () => {
         CN: "C",
       },
       letterCounts: { N: 2, C: 1, B: 1 },
-    }
+    },
   );
 });
 
@@ -76,7 +76,7 @@ Deno.test("day14/runs one step", () => {
         CC: "N",
         CN: "C",
       },
-      { N: 2, C: 1, B: 1 }
+      { N: 2, C: 1, B: 1 },
     ),
     {
       pairs: { NC: 1, CN: 1, NB: 1, BC: 1, CH: 1, HB: 1 },
@@ -86,7 +86,7 @@ Deno.test("day14/runs one step", () => {
         B: 2,
         H: 1,
       },
-    }
+    },
   );
   assertEquals(
     stepOnce(
@@ -114,7 +114,7 @@ Deno.test("day14/runs one step", () => {
         C: 4,
         B: 6,
         H: 1,
-      }
+      },
     ),
     {
       pairs: {
@@ -136,7 +136,7 @@ Deno.test("day14/runs one step", () => {
         H: 4,
         N: 5,
       },
-    }
+    },
   );
 });
 
@@ -163,14 +163,14 @@ Deno.test("day14/step n times", () => {
         CN: "C",
       },
       { N: 2, C: 1, B: 1 },
-      1
+      1,
     ),
     {
       N: 2,
       C: 2,
       B: 2,
       H: 1,
-    }
+    },
   );
   assertEquals(
     stepN(
@@ -194,14 +194,14 @@ Deno.test("day14/step n times", () => {
         CN: "C",
       },
       { N: 2, C: 1, B: 1 },
-      2
+      2,
     ),
     {
       N: [..."NBCCNBBBCBHCB"].filter((x) => x === "N").length,
       B: [..."NBCCNBBBCBHCB"].filter((x) => x === "B").length,
       C: [..."NBCCNBBBCBHCB"].filter((x) => x === "C").length,
       H: [..."NBCCNBBBCBHCB"].filter((x) => x === "H").length,
-    }
+    },
   );
   assertEquals(
     stepN(
@@ -225,14 +225,14 @@ Deno.test("day14/step n times", () => {
         CN: "C",
       },
       { N: 2, C: 1, B: 1 },
-      3
+      3,
     ),
     {
       N: [..."NBBBCNCCNBBNBNBBCHBHHBCHB"].filter((x) => x === "N").length,
       B: [..."NBBBCNCCNBBNBNBBCHBHHBCHB"].filter((x) => x === "B").length,
       C: [..."NBBBCNCCNBBNBNBBCHBHHBCHB"].filter((x) => x === "C").length,
       H: [..."NBBBCNCCNBBNBNBBCHBHHBCHB"].filter((x) => x === "H").length,
-    }
+    },
   );
   assertEquals(
     stepN(
@@ -256,22 +256,22 @@ Deno.test("day14/step n times", () => {
         CN: "C",
       },
       { N: 2, C: 1, B: 1 },
-      4
+      4,
     ),
     {
       N: [..."NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB"].filter(
-        (x) => x === "N"
+        (x) => x === "N",
       ).length,
       B: [..."NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB"].filter(
-        (x) => x === "B"
+        (x) => x === "B",
       ).length,
       C: [..."NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB"].filter(
-        (x) => x === "C"
+        (x) => x === "C",
       ).length,
       H: [..."NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB"].filter(
-        (x) => x === "H"
+        (x) => x === "H",
       ).length,
-    }
+    },
   );
 });
 

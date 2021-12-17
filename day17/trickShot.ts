@@ -19,7 +19,7 @@ type Probe = {
 export const parseInput = (filePath: string): Area => {
   const inputLine = getInputStrings(filePath)[0];
   const matches = inputLine.match(
-    /^target area: x=(-?\d+)..(-?\d+), y=(-?\d+)..(-?\d+)$/
+    /^target area: x=(-?\d+)..(-?\d+), y=(-?\d+)..(-?\d+)$/,
   );
   if (!matches) throw new Error("Unrecognised input");
   return [
@@ -33,11 +33,10 @@ export const parseInput = (filePath: string): Area => {
 const add = ([aX, aY]: Vector, [bX, bY]: Vector): Vector => [aX + bX, aY + bY];
 
 const updateVelocity = ([dX, dY]: Vector): Vector => {
-  const drag =
-    [
-      [(v: number) => v > 0, -1] as const,
-      [(v: number) => v < 0, +1] as const,
-    ].find(([condition]) => condition(dX))?.[1] ?? 0;
+  const drag = [
+    [(v: number) => v > 0, -1] as const,
+    [(v: number) => v < 0, +1] as const,
+  ].find(([condition]) => condition(dX))?.[1] ?? 0;
   return [dX + drag, dY - 1];
 };
 
@@ -131,8 +130,9 @@ export const solvePart1 = (filePath: string) => {
   const target = parseInput(filePath);
 
   const successfulProbes = getSuccessfulProbes(target);
-  if (successfulProbes.length === 0)
+  if (successfulProbes.length === 0) {
     throw new Error("Failed to find a successful probe");
+  }
   return successfulProbes
     .map((probe) => getMaximumHeight(probe))
     .reduce((acc, curr) => Math.max(acc, curr), -Infinity);

@@ -34,13 +34,15 @@ const buildDigitIdentifier = (inputSignals: string[]) => {
         symbolsInFour.every((symbolInFour) =>
           outputSignal.includes(symbolInFour)
         )
-      )
+      ) {
         return "9";
+      }
       if (
         // "6" is NOT a super set of "1"
         !symbolsInOne.every((symbolInOne) => outputSignal.includes(symbolInOne))
-      )
+      ) {
         return "6";
+      }
       // "0" is the only other length 6 possibility
       return "0";
     }
@@ -49,15 +51,17 @@ const buildDigitIdentifier = (inputSignals: string[]) => {
       if (
         // "3" is a super set of "1"
         symbolsInOne.every((symbolInOne) => outputSignal.includes(symbolInOne))
-      )
+      ) {
         return "3";
+      }
       if (
         // "5" shares exactly 3 symbols with "4"
         symbolsInFour.filter((symbolInFour) =>
           outputSignal.includes(symbolInFour)
         ).length === 3
-      )
+      ) {
         return "5";
+      }
       // "2" is the only other length 5 possibility
       return "2";
     }
