@@ -8,9 +8,9 @@ type Leaf = {
 /**
  * A binary tree structure
  */
-type Pair = {
-  left: Pair | Leaf;
-  right: Pair | Leaf;
+export type Tree = {
+  left: Tree | Leaf;
+  right: Tree | Leaf;
 };
 
 /**
@@ -34,7 +34,7 @@ export const findMiddle = (input: string): number => {
   throw new Error("No middle found!");
 };
 
-export const parseToTree = (input: string): Pair | Leaf => {
+export const parseToTree = (input: string): Tree | Leaf => {
   const value = parseInt(input);
   if (!Number.isNaN(value)) return { value };
 
@@ -48,5 +48,54 @@ export const parseToTree = (input: string): Pair | Leaf => {
   };
 };
 
-// TODO preorder traversal (needed for explosions)
-// TODO update a numeric value in place (needed for explosions)
+const isLeaf = (tree: Tree | Leaf): tree is Leaf =>
+  (tree as Leaf).value !== undefined;
+
+/**
+ * Render this tree in preorder traversal
+ */
+export const toString = (tree: Tree | Leaf): string => {
+  if (isLeaf(tree)) return tree.value.toString();
+  return `[${toString(tree.left)},${toString(tree.right)}]`;
+};
+
+export const getHeight = (tree: Tree | Leaf): number => {
+  if (isLeaf(tree)) return 0;
+  return 1 + Math.max(getHeight(tree.left), getHeight(tree.right));
+};
+
+const getTreeNodesInPreorder = (tree: Tree | Leaf): Array<Tree> =>
+  isLeaf(tree) ? [] : [
+    tree,
+    ...getTreeNodesInPreorder(tree.left),
+    ...getTreeNodesInPreorder(tree.right),
+  ];
+
+const splitLeaf = ({ value }: Leaf): Tree => (
+  {
+    left: { value: Math.floor(value / 2) },
+    right: { value: Math.ceil(value / 2) },
+  }
+);
+
+/**
+ * Attempts to perform exactly one split on this tree
+ *
+ * Mutates the tree in place
+ *
+ * @returns true if a split was performed
+ */
+export const split = (tree: Tree): boolean => {
+  const preorderNodes = getTreeNodesInPreorder(tree);
+  for (const node of preorderNodes) {
+    if (isLeaf(node.left) && node.left.value >= 10) {
+      node.left = splitLeaf(node.left);
+      return true;
+    }
+    if (isLeaf(node.right) && node.right.value >= 10) {
+      node.right = splitLeaf(node.right);
+      return true;
+    }
+  }
+  return false;
+};
