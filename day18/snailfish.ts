@@ -194,3 +194,11 @@ export const solvePart1 = (filePath: string) =>
   magnitude(
     addAll(getInputStrings(filePath).filter((line) => line.length > 0)),
   );
+
+export const solvePart2 = (filePath: string): number => {
+  const inputs = getInputStrings(filePath).filter((line) => line.length > 0);
+
+  return inputs.flatMap((leftArg) =>
+    inputs.map((rightArg) => add(leftArg, rightArg))
+  ).map(magnitude).reduce((acc, curr) => Math.max(acc, curr));
+};

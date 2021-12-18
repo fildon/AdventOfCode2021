@@ -6,6 +6,7 @@ import {
   magnitude,
   reduce,
   solvePart1,
+  solvePart2,
   split,
 } from "./snailfish.ts";
 
@@ -124,5 +125,14 @@ Deno.test({
   fn: () => {
     assertEquals(solvePart1("day18/testinput.txt"), 4140);
     assertEquals(solvePart1("day18/input.txt"), 4072);
+  },
+});
+
+Deno.test({
+  name: "day18/solves part 2",
+  ignore: false,
+  fn: () => {
+    assertEquals(solvePart2("day18/testinput.txt"), 3993);
+    assertEquals(solvePart2("day18/input.txt"), 4483);
   },
 });
