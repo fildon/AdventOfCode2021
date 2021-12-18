@@ -1,3 +1,132 @@
+import { getInputStrings } from "../utils/inputparsing.ts";
+
+export const split = (tree: string): string => {
+  const start = tree.search(/\d\d/g);
+  // Nothing to split
+  if (start === -1) return tree;
+
+  const bigNumLength = tree.match(/\d\d+/g)![0].length;
+
+  const bigNum = parseInt(tree.slice(start, start + bigNumLength));
+  const leftVal = Math.floor(bigNum / 2);
+  const rightVal = Math.ceil(bigNum / 2);
+  const leftString = tree.slice(0, start);
+  const rightString = tree.slice(start + bigNumLength);
+
+  return `${leftString}[${leftVal},${rightVal}]${rightString}`;
+};
+
+/**
+ * @returns depth at index of tree
+ */
+const depth = (tree: string, index: number): number => {
+  const open = [...tree.slice(0, index)].filter((char) => char === "[").length;
+  const close = [...tree.slice(0, index)].filter((char) => char === "]").length;
+  return open - close;
+};
+
+/**
+ * Adds the provided number to the last number in the string
+ *
+ * Returns the new string after addition
+ *
+ * If there is no number to add to in the string, it is returned as-is
+ */
+const addNumberToLast = (tree: string, num: number): string => {
+  const numberRegex = /\d+/g;
+  let match: RegExpExecArray | null = null;
+  const matches: Array<number> = [];
+  while ((match = numberRegex.exec(tree)) !== null) {
+    matches.push(match.index);
+  }
+
+  // No numbers found
+  if (matches.length === 0) return tree;
+
+  const numberStart = matches[matches.length - 1];
+  const numberLength = tree.slice(numberStart).search(/[\],]/g);
+  const numberStr = tree.slice(numberStart, numberStart + numberLength);
+  const oldVal = parseInt(numberStr);
+  return `${tree.slice(0, numberStart)}${oldVal + num}${
+    tree.slice(numberStart + numberLength)
+  }`;
+};
+
+/**
+ * Adds the provided number to the first number in the string
+ *
+ * Returns the new string after addition
+ *
+ * If there is no number to add to in the string, it is returned as-is
+ */
+const addNumberToFirst = (tree: string, num: number): string => {
+  const numberStart = tree.search(/\d+/g);
+  // No number found
+  if (numberStart === -1) return tree;
+  const numberLength = tree.slice(numberStart).search(/[\],]/g);
+  const numberStr = tree.slice(numberStart, numberStart + numberLength);
+  const oldVal = parseInt(numberStr);
+  return `${tree.slice(0, numberStart)}${oldVal + num}${
+    tree.slice(numberStart + numberLength)
+  }`;
+};
+
+/**
+ * Finds where an explode should start, or undefined if no explode is required
+ */
+const findExplodeStart = (tree: string): number | undefined => {
+  const pairLocations: Array<number> = [];
+  let match: RegExpExecArray | null = null;
+  const pairRegex = /\[\d+,\d+\]/g;
+  while ((match = pairRegex.exec(tree)) !== null) {
+    pairLocations.push(match.index);
+  }
+  return pairLocations.find((index) => depth(tree, index) >= 4);
+};
+
+export const explode = (tree: string): string => {
+  const explodeStart = findExplodeStart(tree);
+  if (explodeStart === undefined) return tree;
+  const explodeEnd = explodeStart + tree.slice(explodeStart).indexOf("]") + 1;
+
+  const explodeString = tree.slice(explodeStart, explodeEnd);
+  const comma = explodeString.indexOf(",");
+  const leftNum = parseInt(explodeString.slice(1, comma));
+  const rightNum = parseInt(explodeString.slice(comma + 1));
+
+  const left = addNumberToLast(tree.slice(0, explodeStart), leftNum);
+  const right = addNumberToFirst(tree.slice(explodeEnd), rightNum);
+
+  return `${left}0${right}`;
+};
+
+export const reduce = (tree: string): string => {
+  let previous = tree;
+  let current = tree;
+  while (true) {
+    current = explode(current);
+    if (current !== previous) {
+      previous = current;
+      continue;
+    }
+    current = split(current);
+    if (current !== previous) {
+      previous = current;
+      continue;
+    }
+    return current;
+  }
+};
+
+export const add = (a: string, b: string): string => {
+  return reduce(`[${a},${b}]`);
+};
+
+export const addAll = (trees: Array<string>): string => {
+  if (trees.length === 0) throw new Error("Can't sum empty list");
+  return trees.reduce(add);
+};
+
 /**
  * Leaf node of a tree
  */
@@ -8,7 +137,7 @@ type Leaf = {
 /**
  * A binary tree structure
  */
-export type Tree = {
+type Tree = {
   left: Tree | Leaf;
   right: Tree | Leaf;
 };
@@ -19,7 +148,7 @@ export type Tree = {
  * That is the point at which everything to the left is the left child
  * and everything to the right is the right child.
  */
-export const findMiddle = (input: string): number => {
+const findMiddle = (input: string): number => {
   let index = 0;
   while (index !== -1) {
     index = input.indexOf(",", index + 1);
@@ -34,7 +163,7 @@ export const findMiddle = (input: string): number => {
   throw new Error("No middle found!");
 };
 
-export const parseToTree = (input: string): Tree | Leaf => {
+const parse = (input: string): Tree | Leaf => {
   const value = parseInt(input);
   if (!Number.isNaN(value)) return { value };
 
@@ -43,59 +172,25 @@ export const parseToTree = (input: string): Tree | Leaf => {
   const rightString = input.slice(middle + 1, input.length - 1);
 
   return {
-    left: parseToTree(leftString),
-    right: parseToTree(rightString),
+    left: parse(leftString),
+    right: parse(rightString),
   };
 };
 
 const isLeaf = (tree: Tree | Leaf): tree is Leaf =>
   (tree as Leaf).value !== undefined;
 
-/**
- * Render this tree in preorder traversal
- */
-export const toString = (tree: Tree | Leaf): string => {
-  if (isLeaf(tree)) return tree.value.toString();
-  return `[${toString(tree.left)},${toString(tree.right)}]`;
+const magnitudeRecurse = (tree: Tree | Leaf): number => {
+  if (isLeaf(tree)) return tree.value;
+  return 3 * magnitudeRecurse(tree.left) + 2 * magnitudeRecurse(tree.right);
 };
 
-export const getHeight = (tree: Tree | Leaf): number => {
-  if (isLeaf(tree)) return 0;
-  return 1 + Math.max(getHeight(tree.left), getHeight(tree.right));
+export const magnitude = (tree: string): number => {
+  const treeStructure = parse(tree);
+  return magnitudeRecurse(treeStructure);
 };
 
-const getTreeNodesInPreorder = (tree: Tree | Leaf): Array<Tree> =>
-  isLeaf(tree) ? [] : [
-    tree,
-    ...getTreeNodesInPreorder(tree.left),
-    ...getTreeNodesInPreorder(tree.right),
-  ];
-
-const splitLeaf = ({ value }: Leaf): Tree => (
-  {
-    left: { value: Math.floor(value / 2) },
-    right: { value: Math.ceil(value / 2) },
-  }
-);
-
-/**
- * Attempts to perform exactly one split on this tree
- *
- * Mutates the tree in place
- *
- * @returns true if a split was performed
- */
-export const split = (tree: Tree): boolean => {
-  const preorderNodes = getTreeNodesInPreorder(tree);
-  for (const node of preorderNodes) {
-    if (isLeaf(node.left) && node.left.value >= 10) {
-      node.left = splitLeaf(node.left);
-      return true;
-    }
-    if (isLeaf(node.right) && node.right.value >= 10) {
-      node.right = splitLeaf(node.right);
-      return true;
-    }
-  }
-  return false;
-};
+export const solvePart1 = (filePath: string) =>
+  magnitude(
+    addAll(getInputStrings(filePath).filter((line) => line.length > 0)),
+  );
