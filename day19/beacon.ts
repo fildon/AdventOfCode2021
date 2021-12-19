@@ -4,6 +4,9 @@ import { getInputStrings } from "../utils/inputparsing.ts";
  * 3D vector of the form [x, y, z]
  */
 type Vector = [number, number, number];
+/**
+ * A scanner is just a collection of beacon locations
+ */
 type Scanner = Array<Vector>;
 type LockResult = { scanner: Scanner; offset: Vector };
 
@@ -110,6 +113,9 @@ export const parseInputLines = (
   return scanners;
 };
 
+/**
+ * Returns the number of _unique_ beacons among this collection of scanners
+ */
 export const countBeacons = (scanners: Array<Scanner>) => {
   const seen: Array<Vector> = [];
   scanners.flat().forEach((beacon) =>
@@ -118,6 +124,11 @@ export const countBeacons = (scanners: Array<Scanner>) => {
   return seen.length;
 };
 
+/**
+ * Locks all scanners relative to the first scanner's reference frame
+ *
+ * Returns the set of all locked scanners and the offsets used
+ */
 const lockAllScanners = (scanners: Array<Scanner>) => {
   // We treat scanner 0 as being our origin and common reference frame
   const lockedScanners = [scanners[0]];
@@ -138,6 +149,7 @@ const lockAllScanners = (scanners: Array<Scanner>) => {
           ...unlockedScanners.slice(0, j),
           ...unlockedScanners.slice(j + 1),
         ];
+        // We've modified one of our iterating arrays, so we break out and restart the loops
         break searchLockPair;
       }
     }
@@ -171,6 +183,5 @@ export const solvePart2 = (filePath: string) => {
 
   return pairs(offsets).map(manhattan).reduce(
     (acc, curr) => Math.max(acc, curr),
-    -Infinity,
   );
 };
