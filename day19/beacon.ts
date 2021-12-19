@@ -118,9 +118,7 @@ export const countBeacons = (scanners: Array<Scanner>) => {
   return seen.length;
 };
 
-export const solvePart1 = (filePath: string) => {
-  const scanners = parseInputLines(getInputStrings(filePath));
-
+const lockAllScanners = (scanners: Array<Scanner>) => {
   // We treat scanner 0 as being our origin and common reference frame
   const lockedScanners = [scanners[0]];
   const offsets: Array<Vector> = [[0, 0, 0]];
@@ -144,6 +142,16 @@ export const solvePart1 = (filePath: string) => {
       }
     }
   }
+  return {
+    lockedScanners,
+    offsets,
+  };
+};
+
+export const solvePart1 = (filePath: string) => {
+  const scanners = parseInputLines(getInputStrings(filePath));
+
+  const { lockedScanners } = lockAllScanners(scanners);
 
   return countBeacons(lockedScanners);
 };
