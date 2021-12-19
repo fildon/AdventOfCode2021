@@ -1,5 +1,11 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { countOverlaps, lockPair, parseInputLines } from "./beacon.ts";
+import {
+  countBeacons,
+  countOverlaps,
+  lockPair,
+  parseInputLines,
+  solvePart1,
+} from "./beacon.ts";
 
 Deno.test("day19/count overlaps", () => {
   assertEquals(countOverlaps([], []), 0);
@@ -109,7 +115,6 @@ Deno.test("day19/parse input lines", () => {
     parseInputLines([
       "--- scanner 0 ---",
       "1,2,3",
-      "",
       "--- scanner 1 ---",
       "-4,-5,-6",
       "7,-8,-9",
@@ -117,4 +122,21 @@ Deno.test("day19/parse input lines", () => {
     ]),
     [[[1, 2, 3]], [[-4, -5, -6], [7, -8, -9]]],
   );
+});
+
+Deno.test("day19/counts beacons", () => {
+  assertEquals(countBeacons([[[1, 2, 3]]]), 1);
+  assertEquals(countBeacons([[[1, 2, 3]], [[1, 2, 3], [4, 5, 6]]]), 2);
+});
+
+Deno.test("day19/solves part 1 test input", () => {
+  assertEquals(solvePart1("day19/testinput.txt"), 79);
+});
+
+Deno.test({
+  name: "day19/solves part 1",
+  ignore: true, // Passes, but takes 6.5 minutes to run
+  fn: () => {
+    assertEquals(solvePart1("day19/input.txt"), 338);
+  },
 });

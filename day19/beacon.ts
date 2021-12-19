@@ -1,3 +1,5 @@
+import { getInputStrings } from "../utils/inputparsing.ts";
+
 /**
  * 3D vector of the form [x, y, z]
  */
@@ -86,8 +88,6 @@ export const lockPair = (
 
 /**
  * Parses scanners from input lines
- *
- * **WARNING**: assumes every scanner is terminated by a blank line
  */
 export const parseInputLines = (
   inputLines: Array<string>,
@@ -95,13 +95,51 @@ export const parseInputLines = (
   const scanners: Array<Scanner> = [];
   let currentScanner: Scanner = [];
   for (const line of inputLines) {
-    if (line.includes("---")) continue;
-    if (line.length === 0) {
+    if (line.includes("---")) {
+      if (currentScanner.length === 0) continue;
       scanners.push([...currentScanner]);
       currentScanner = [];
       continue;
     }
+    if (line.length === 0) continue;
     currentScanner.push(line.split(",").map((n) => parseInt(n)) as Vector);
   }
+  scanners.push(currentScanner);
   return scanners;
+};
+
+export const countBeacons = (scanners: Array<Scanner>) => {
+  const seen: Array<Vector> = [];
+  scanners.flat().forEach((beacon) =>
+    !seen.some(equals(beacon)) && seen.push(beacon)
+  );
+  return seen.length;
+};
+
+export const solvePart1 = (filePath: string) => {
+  const scanners = parseInputLines(getInputStrings(filePath));
+
+  // We treat scanner 0 as being our origin and common reference frame
+  const lockedScanners = [scanners[0]];
+  let unlockedScanners = scanners.slice(1);
+
+  while (unlockedScanners.length > 0) {
+    searchLockPair:
+    for (let i = 0; i < lockedScanners.length; i++) {
+      for (let j = 0; j < unlockedScanners.length; j++) {
+        const result = lockPair(lockedScanners[i], unlockedScanners[j]);
+        if (!result) continue;
+        // We found a lock result! Add it to the known lock set
+        lockedScanners.push(result);
+        // And remove its corresponding unlocked version
+        unlockedScanners = [
+          ...unlockedScanners.slice(0, j),
+          ...unlockedScanners.slice(j + 1),
+        ];
+        break searchLockPair;
+      }
+    }
+  }
+
+  return countBeacons(lockedScanners);
 };
