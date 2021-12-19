@@ -155,3 +155,22 @@ export const solvePart1 = (filePath: string) => {
 
   return countBeacons(lockedScanners);
 };
+
+export const manhattan = ([[x, y, z], [a, b, c]]: [Vector, Vector]) =>
+  [a - x, b - y, c - z].map(Math.abs).reduce((acc, curr) => acc + curr);
+
+const pairs = <Element>(array: Array<Element>) =>
+  array.flatMap((elementA) =>
+    array.map((elementB) => [elementA, elementB] as [Element, Element])
+  );
+
+export const solvePart2 = (filePath: string) => {
+  const scanners = parseInputLines(getInputStrings(filePath));
+
+  const { offsets } = lockAllScanners(scanners);
+
+  return pairs(offsets).map(manhattan).reduce(
+    (acc, curr) => Math.max(acc, curr),
+    -Infinity,
+  );
+};

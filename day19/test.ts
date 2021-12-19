@@ -3,8 +3,10 @@ import {
   countBeacons,
   countOverlaps,
   lockPair,
+  manhattan,
   parseInputLines,
   solvePart1,
+  solvePart2,
 } from "./beacon.ts";
 
 Deno.test("day19/count overlaps", () => {
@@ -138,8 +140,24 @@ Deno.test("day19/solves part 1 test input", () => {
 
 Deno.test({
   name: "day19/solves part 1",
-  ignore: true, // Passes, but takes 6.5 minutes to run
+  ignore: true, // Passes, but takes 7 minutes to run
   fn: () => {
     assertEquals(solvePart1("day19/input.txt"), 338);
+  },
+});
+
+Deno.test("day19/manhattan distance", () => {
+  assertEquals(manhattan([[1105, -1205, 1229], [-92, -2380, -20]]), 3621);
+});
+
+Deno.test("day19/solves part 2 test input", () => {
+  assertEquals(solvePart2("day19/testinput.txt"), 3621);
+});
+
+Deno.test({
+  name: "day19/solves part 2",
+  ignore: true, // Passes, but takes 7 minutes to run
+  fn: () => {
+    assertEquals(solvePart2("day19/input.txt"), 9862);
   },
 });
