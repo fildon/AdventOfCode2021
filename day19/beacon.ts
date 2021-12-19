@@ -5,6 +5,7 @@ import { getInputStrings } from "../utils/inputparsing.ts";
  */
 type Vector = [number, number, number];
 type Scanner = Array<Vector>;
+type LockResult = { scanner: Scanner; offset: Vector };
 
 const equals = ([a, b, c]: Vector) =>
   ([x, y, z]: Vector) => a === x && b === y && c === z;
@@ -63,16 +64,17 @@ const createOffsets = (scanner: Scanner) =>
   (vector: Vector) => scanner.map(minus(vector));
 
 const applyOffset = (scanner: Scanner) =>
-  (offSet: Vector) => scanner.map(add(offSet));
+  (offset: Vector) => ({ scanner: scanner.map(add(offset)), offset });
 
-const offsets = (scannerA: Scanner) =>
-  (scannerB: Scanner): Array<Scanner> =>
+const withOffsets = (scannerA: Scanner) =>
+  (scannerB: Scanner) =>
     scannerB.flatMap(createOffsets(scannerA)).map(
       applyOffset(scannerB),
     );
 
 const overlaps = (scannerA: Scanner) =>
-  (scannerB: Scanner) => countOverlaps(scannerA, scannerB) >= 12;
+  ({ scanner: scannerB }: LockResult) =>
+    countOverlaps(scannerA, scannerB) >= 12;
 
 /**
  * Attempts to lock scannerB relative to scannerA
@@ -83,8 +85,8 @@ const overlaps = (scannerA: Scanner) =>
 export const lockPair = (
   scannerA: Array<Vector>,
   scannerB: Array<Vector>,
-): Array<Vector> | undefined =>
-  rotations(scannerB).flatMap(offsets(scannerA)).find(overlaps(scannerA));
+) =>
+  rotations(scannerB).flatMap(withOffsets(scannerA)).find(overlaps(scannerA));
 
 /**
  * Parses scanners from input lines
@@ -121,6 +123,7 @@ export const solvePart1 = (filePath: string) => {
 
   // We treat scanner 0 as being our origin and common reference frame
   const lockedScanners = [scanners[0]];
+  const offsets: Array<Vector> = [[0, 0, 0]];
   let unlockedScanners = scanners.slice(1);
 
   while (unlockedScanners.length > 0) {
@@ -130,7 +133,8 @@ export const solvePart1 = (filePath: string) => {
         const result = lockPair(lockedScanners[i], unlockedScanners[j]);
         if (!result) continue;
         // We found a lock result! Add it to the known lock set
-        lockedScanners.push(result);
+        lockedScanners.push(result.scanner);
+        offsets.push(result.offset);
         // And remove its corresponding unlocked version
         unlockedScanners = [
           ...unlockedScanners.slice(0, j),
