@@ -3,26 +3,7 @@
  */
 type Vector = [number, number, number];
 
-type Scanner = {
-  /**
-   * Position vector assumed relative to some arbitrary origin
-   */
-  position: Vector;
-  /**
-   * Which direction this scanner is pointing along
-   */
-  facing: Vector;
-  /**
-   * Which direction is "up" for this scanner
-   */
-  up: Vector;
-  /**
-   * Beacons this scanner can see
-   */
-  beacons: Array<Vector>;
-};
-
-export const getRotations = ([x, y, z]: Vector): Array<Vector> => [
+export const getRotations = ([x, y, z]: Vector) => [
   // x = 1
   [x, y, z],
   [x, -z, y],
@@ -59,3 +40,19 @@ export const getRotations = ([x, y, z]: Vector): Array<Vector> => [
   [z, y, -x],
   [-y, z, -x],
 ];
+
+const equals = ([a, b, c]: Vector) =>
+  ([x, y, z]: Vector) => a === x && b === y && c === z;
+
+const inCollection = (vectors: Array<Vector>) =>
+  (vector: Vector) => vectors.some(equals(vector));
+
+const count = <T>(
+  collection: Array<T>,
+  condition: (element: T) => boolean,
+) => collection.filter(condition).length;
+
+export const countOverlaps = (
+  vectorsA: Array<Vector>,
+  vectorsB: Array<Vector>,
+) => count(vectorsA, inCollection(vectorsB));

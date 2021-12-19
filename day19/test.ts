@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { getRotations } from "./beacon.ts";
+import { countOverlaps, getRotations } from "./beacon.ts";
 
 Deno.test("day19/get rotations", () => {
   assertEquals(getRotations([1, 2, 3]), [
@@ -39,4 +39,14 @@ Deno.test("day19/get rotations", () => {
     [3, 2, -1],
     [-2, 3, -1],
   ]);
+});
+
+Deno.test("day19/count overlaps", () => {
+  assertEquals(countOverlaps([], []), 0);
+  assertEquals(countOverlaps([[1, 2, 3]], [[1, 2, 3]]), 1);
+  assertEquals(countOverlaps([[0, 0, 0], [1, 2, 3]], [[1, 2, 3]]), 1);
+  assertEquals(
+    countOverlaps([[0, 0, 0], [1, 2, 3]], [[1, 2, 3], [-1, -2, -3]]),
+    1,
+  );
 });
