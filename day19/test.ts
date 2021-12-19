@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { countOverlaps, lockPair } from "./beacon.ts";
+import { countOverlaps, lockPair, parseInputLines } from "./beacon.ts";
 
 Deno.test("day19/count overlaps", () => {
   assertEquals(countOverlaps([], []), 0);
@@ -93,5 +93,28 @@ Deno.test("day19/lock scanner", () => {
       [-687, -1600, 576],
       [-485, -357, 347],
     ],
+  );
+});
+
+Deno.test("day19/parse input lines", () => {
+  assertEquals(
+    parseInputLines([
+      "--- scanner 0 ---",
+      "1,2,3",
+      "",
+    ]),
+    [[[1, 2, 3]]],
+  );
+  assertEquals(
+    parseInputLines([
+      "--- scanner 0 ---",
+      "1,2,3",
+      "",
+      "--- scanner 1 ---",
+      "-4,-5,-6",
+      "7,-8,-9",
+      "",
+    ]),
+    [[[1, 2, 3]], [[-4, -5, -6], [7, -8, -9]]],
   );
 });

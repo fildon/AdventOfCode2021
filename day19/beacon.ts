@@ -83,3 +83,25 @@ export const lockPair = (
   scannerB: Array<Vector>,
 ): Array<Vector> | undefined =>
   rotations(scannerB).flatMap(offsets(scannerA)).find(overlaps(scannerA));
+
+/**
+ * Parses scanners from input lines
+ *
+ * **WARNING**: assumes every scanner is terminated by a blank line
+ */
+export const parseInputLines = (
+  inputLines: Array<string>,
+): Array<Scanner> => {
+  const scanners: Array<Scanner> = [];
+  let currentScanner: Scanner = [];
+  for (const line of inputLines) {
+    if (line.includes("---")) continue;
+    if (line.length === 0) {
+      scanners.push([...currentScanner]);
+      currentScanner = [];
+      continue;
+    }
+    currentScanner.push(line.split(",").map((n) => parseInt(n)) as Vector);
+  }
+  return scanners;
+};
