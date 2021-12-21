@@ -67,14 +67,36 @@ const countLights = (image: Image) =>
 
 const print = (image: Image) => console.log(image.join("\n"));
 
+const enhancePixel = (
+  image: Image,
+  enhancementRules: string,
+  location: Coordinate,
+  steps = 0
+): string => {
+  if (steps < 1) return lookupPixel(image)(location);
+  return enhancementRules[
+    neighboursOf(location)
+      .map((neighbour) =>
+        enhancePixel(image, enhancementRules, neighbour, steps - 1)
+      )
+      .map((pixel, index) => (pixel === "#" ? 2 ** (8 - index) : 0))
+      .reduce(sum)
+  ];
+};
+
 export const solvePart1 = (filePath: string) => {
   const { enhancementRules, image } = parseInput(filePath);
 
-  print(image);
-  const one = enhanceTimes(image, enhancementRules, 1);
-  print(one);
-  const two = enhanceTimes(image, enhancementRules, 2);
-  print(two);
+  const STEPS = 2;
 
-  return countLights(two);
+  const enhancedImage: Image = [];
+  for (let row = -STEPS; row < image.length + STEPS; row++) {
+    const enhancedRow: Array<string> = [];
+    for (let col = -10; col < image[0].length + 10; col++) {
+      const pixel = enhancePixel(image, enhancementRules, [row, col], STEPS);
+      enhancedRow.push(pixel);
+    }
+    enhancedImage.push(enhancedRow.join(""));
+  }
+  return countLights(enhancedImage);
 };

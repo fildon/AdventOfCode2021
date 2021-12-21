@@ -54,7 +54,6 @@ Deno.test({
   ignore: false,
   fn: () => {
     assertEquals(solvePart1("day20/testinput.txt"), 35);
-    // 5551 was too low
-    // assertEquals(solvePart1("day20/input.txt"), -1);
+    assertEquals(solvePart1("day20/input.txt"), 5622);
   },
 });
