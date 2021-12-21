@@ -6,8 +6,8 @@ const testrules =
 const testimage = ["#..#.", "#....", "##..#", "..#..", "..###"];
 
 Deno.test("day20/parses input", () => {
-  const { enhancementRules, image } = parseInput("day20/testinput.txt");
-  assertEquals(enhancementRules, testrules);
+  const { rules, image } = parseInput("day20/testinput.txt");
+  assertEquals(rules, testrules);
   assertEquals(image, testimage);
 });
 
