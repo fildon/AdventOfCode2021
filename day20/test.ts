@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { neighboursOf, parseInput, solvePart1 } from "./trench.ts";
+import { neighboursOf, parseInput, solvePart1, solvePart2 } from "./trench.ts";
 
 const testrules =
   "..#.#..#####.#.#.#.###.##.....###.##.#..###.####..#####..#....#..#..##..###..######.###...####..#..#####..##..#.#####...##.#.#..#.##..#.#......#.###.######.###.####...#.##.##..#..#..#####.....#.#....###..#.##......#.....#..#..#..##..#...##.######.####.####.#.#...#.......#..#.#.#...####.##.#......#..#...##.#.##..#...##.#.##..###.#......#.#.......#.#.#.####.###.##...#.....####.#..#..#.##.#....##..#.####....##...##..#...#......#.#.......#.......##..####..#...#.#.#...##..#.#..###..#####........#..####......#..#";
@@ -31,5 +31,14 @@ Deno.test({
   fn: () => {
     assertEquals(solvePart1("day20/testinput.txt"), 35);
     assertEquals(solvePart1("day20/input.txt"), 5622);
+  },
+});
+
+Deno.test({
+  name: "day20/solves part 2",
+  ignore: false,
+  fn: () => {
+    assertEquals(solvePart2("day20/testinput.txt"), 3351);
+    assertEquals(solvePart2("day20/input.txt"), 20395);
   },
 });
