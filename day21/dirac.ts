@@ -73,14 +73,53 @@ const hashGame = (
     ",",
   );
 
-export const advanceDiracGame = (game: PartialGame) => {
-  // One turn has 3 - 9 => 7 possible outcomes (not equally weighted!)
-  // ways to make each result = [1, 3, 6, 7, 6, 3, 1] = 27 total outcomes (3 ** 3)
+/**
+ * All possible results of rolling a dirac die three times
+ * weighted by the number of universes with that result
+ */
+const diracOutcomes = [
+  { result: 3, weight: 1 },
+  { result: 4, weight: 3 },
+  { result: 5, weight: 6 },
+  { result: 6, weight: 7 },
+  { result: 7, weight: 6 },
+  { result: 8, weight: 3 },
+  { result: 9, weight: 1 },
+];
+
+export const advanceDiracGame = (
+  { nextPlayer, positions, scores, copies }: PartialGame,
+) => {
+  const range1To10 = buildCircularRange({ min: 1, max: 10 });
+  const newGames: Array<PartialGame> = [];
+  let newP1Wins = 0;
+  let newP2Wins = 0;
+  for (const { result, weight } of diracOutcomes) {
+    const newPosition = range1To10(positions[nextPlayer] + result);
+    const newScore = scores[nextPlayer] + newPosition;
+    if (newScore >= 21) {
+      if (nextPlayer === 0) {
+        newP1Wins += copies * weight;
+      } else {
+        newP2Wins += copies * weight;
+      }
+    } else {
+      newGames.push({
+        nextPlayer: nextPlayer === 0 ? 1 : 0,
+        scores: nextPlayer === 0
+          ? [newScore, scores[1]]
+          : [scores[0], newScore],
+        positions: nextPlayer === 0
+          ? [newPosition, positions[1]]
+          : [positions[0], newPosition],
+        copies: copies * weight,
+      });
+    }
+  }
   return {
-    // TODO remember to multiply certain numbers by the current universe copies
-    newGames: [] as Array<PartialGame>, // TODO new partial games to consider
-    newP1Wins: 0, // TODO as many games were won by p1 as a result of this turn
-    newP2Wins: 0, // TODO as many games were won by p2 as a result of this turn
+    newGames,
+    newP1Wins,
+    newP2Wins,
   };
 };
 

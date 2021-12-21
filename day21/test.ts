@@ -112,12 +112,12 @@ Deno.test("day21/part2 advanceDiracGame", () => {
 });
 
 Deno.test({
-  name: "day21/solves part 2",
-  ignore: true,
+  name: "day21/solves part 2 SLOW",
+  ignore: true, // Passes but takes 9 minutes to run
   fn: () => {
     // test input
     assertEquals(solvePart2(4, 8), 444356092776315);
     // real input
-    assertEquals(solvePart2(3, 10), -1);
+    assertEquals(solvePart2(3, 10), 92399285032143);
   },
 });
