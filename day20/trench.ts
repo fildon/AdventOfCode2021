@@ -5,9 +5,9 @@ type Coordinate = [number, number];
 
 export const parseInput = (filePath: string) => {
   const inputStrings = getInputStrings(filePath);
-  const imageEnhancement = inputStrings[0];
+  const enhancementRules = inputStrings[0];
   const image = inputStrings.slice(1).filter((str) => str.length > 0);
-  return { imageEnhancement, image };
+  return { enhancementRules, image };
 };
 
 export const neighboursOf = ([x, y]: Coordinate) =>
@@ -32,9 +32,49 @@ export const getKeyAt = (image: Image, coord: Coordinate) =>
     .map((pixel, index) => (pixel === "#" ? 2 ** (8 - index) : 0))
     .reduce(sum);
 
-export const solvePart1 = (filePath: string) => {
-  const { imageEnhancement, image } = parseInput(filePath);
+export const enhance = (image: Image, enhancementRules: string): Image => {
+  const newImage: Image = [];
+  /**
+   * Unusual indexes here are to deal with the image expanding
+   */
+  for (let row = -1; row <= image.length; row++) {
+    const newRow: Array<string> = [];
+    for (let col = -1; col <= image[0].length; col++) {
+      const lookupKey = getKeyAt(image, [col, row]);
+      newRow.push(enhancementRules[lookupKey]);
+    }
+    newImage.push(newRow.join(""));
+  }
+  return newImage;
+};
 
-  // TODO
-  // return enhance(image, imageEnhancement).times(2).countLight();
+const enhanceTimes = (
+  image: Image,
+  enhancementRules: string,
+  steps: number
+): Image => {
+  if (steps < 1) return image;
+  return enhanceTimes(
+    enhance(image, enhancementRules),
+    enhancementRules,
+    steps - 1
+  );
+};
+
+const countLights = (image: Image) =>
+  image.flatMap((imageLine) => [...imageLine]).filter((pixel) => pixel === "#")
+    .length;
+
+const print = (image: Image) => console.log(image.join("\n"));
+
+export const solvePart1 = (filePath: string) => {
+  const { enhancementRules, image } = parseInput(filePath);
+
+  print(image);
+  const one = enhanceTimes(image, enhancementRules, 1);
+  print(one);
+  const two = enhanceTimes(image, enhancementRules, 2);
+  print(two);
+
+  return countLights(two);
 };
