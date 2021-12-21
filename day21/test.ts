@@ -1,8 +1,8 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { buildCircularRange, buildDie, solvePart1 } from "./dirac.ts";
+import { buildCircularRange, buildSimpleDie, solvePart1 } from "./dirac.ts";
 
-Deno.test("day21/build die", () => {
-  const die = buildDie();
+Deno.test("day21/build simple die", () => {
+  const die = buildSimpleDie();
   assertEquals(die.getCurrentRollCount(), 0);
 
   const firstRoll = die.roll();
@@ -18,7 +18,7 @@ Deno.test("day21/build die", () => {
 });
 
 Deno.test("day21/die wraps", () => {
-  const die = buildDie();
+  const die = buildSimpleDie();
   for (let i = 0; i < 99; i++) {
     die.roll();
   }
