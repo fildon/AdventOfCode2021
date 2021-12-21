@@ -1,11 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import {
-  parseInput,
-  solvePart1,
-  neighboursOf,
-  getKeyAt,
-  enhance,
-} from "./trench.ts";
+import { parseInput, solvePart1, neighboursOf } from "./trench.ts";
 
 const testrules =
   "..#.#..#####.#.#.#.###.##.....###.##.#..###.####..#####..#....#..#..##..###..######.###...####..#..#####..##..#.#####...##.#.#..#.##..#.#......#.###.######.###.####...#.##.##..#..#..#####.....#.#....###..#.##......#.....#..#..#..##..#...##.######.####.####.#.#...#.......#..#.#.#...####.##.#......#..#...##.#.##..#...##.#.##..###.#......#.#.......#.#.#.####.###.##...#.....####.#..#..#.##.#....##..#.####....##...##..#...#......#.#.......#.......##..####..#...#.#.#...##..#.#..###..#####........#..####......#..#";
@@ -28,24 +22,6 @@ Deno.test("day20/neighbours", () => {
     [1, 6],
     [2, 6],
     [3, 6],
-  ]);
-});
-
-Deno.test("day20/getKeyAt", () => {
-  const key = getKeyAt(testimage, [2, 2]);
-  assertEquals(key, 34);
-});
-
-Deno.test("day20/enhance image once", () => {
-  const enhancedImage = enhance(testimage, testrules);
-  assertEquals(enhancedImage, [
-    ".##.##.",
-    "#..#.#.",
-    "##.#..#",
-    "####..#",
-    ".#..##.",
-    "..##..#",
-    "...#.#.",
   ]);
 });
 
