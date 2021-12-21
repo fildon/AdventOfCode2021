@@ -41,11 +41,11 @@ Deno.test("day21/build circular range", () => {
 
 Deno.test({
   name: "day21/solves part 1",
-  ignore: true,
+  ignore: false,
   fn: () => {
     // test input
     assertEquals(solvePart1(4, 8), 739785);
     // real input
-    // assertEquals(solvePart1(3, 10), -1);
+    assertEquals(solvePart1(3, 10), 713328);
   },
 });

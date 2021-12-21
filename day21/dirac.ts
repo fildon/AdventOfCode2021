@@ -4,7 +4,7 @@
  * min-max range is inclusive at both ends
  */
 export const buildCircularRange = (
-  { min = 1, max }: { min?: number; max: number },
+  { min, max }: { min: number; max: number },
 ) =>
   (value: number) => {
     let result = value;
@@ -36,5 +36,19 @@ export const buildDie = () => {
 };
 
 export const solvePart1 = (p1Start: number, p2Start: number) => {
-  return 0;
+  const range1To10 = buildCircularRange({ min: 1, max: 10 });
+  const die = buildDie();
+  const scores = [0, 0];
+  const positions = [p1Start, p2Start];
+  let nextPlayer = 0;
+  while (scores.every((score) => score < 1000)) {
+    const rollResult = die.roll() + die.roll() + die.roll();
+    const newPosition = range1To10(positions[nextPlayer] + rollResult);
+    positions[nextPlayer] = newPosition;
+    scores[nextPlayer] += newPosition;
+    nextPlayer = nextPlayer ? 0 : 1;
+  }
+  const loserScore = Math.min(scores[0], scores[1]);
+  const rollCount = die.getCurrentRollCount();
+  return loserScore * rollCount;
 };
