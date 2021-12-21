@@ -15,10 +15,8 @@ export const neighboursOf = ([x, y]: Coordinate) =>
     [-1, 0, 1].map((xOffset) => [x + xOffset, y + yOffset])
   ) as Array<Coordinate>;
 
-const lookupPixel =
-  (image: Image) =>
-  ([x, y]: Coordinate) =>
-    image[y]?.[x] ?? ".";
+const lookupPixel = (image: Image) =>
+  ([x, y]: Coordinate) => image[y]?.[x] ?? ".";
 
 const sum = (a: number, b: number) => a + b;
 
@@ -30,7 +28,7 @@ const enhancePixel = (
   image: Image,
   enhancementRules: string,
   location: Coordinate,
-  steps = 0
+  steps = 0,
 ): string => {
   if (steps < 1) return lookupPixel(image)(location);
   return enhancementRules[
