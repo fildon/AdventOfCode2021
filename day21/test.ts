@@ -1,5 +1,11 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { buildCircularRange, buildSimpleDie, solvePart1 } from "./dirac.ts";
+import {
+  advanceDiracGame,
+  buildCircularRange,
+  buildSimpleDie,
+  solvePart1,
+  solvePart2,
+} from "./dirac.ts";
 
 Deno.test("day21/build simple die", () => {
   const die = buildSimpleDie();
@@ -47,5 +53,71 @@ Deno.test({
     assertEquals(solvePart1(4, 8), 739785);
     // real input
     assertEquals(solvePart1(3, 10), 713328);
+  },
+});
+
+Deno.test("day21/part2 advanceDiracGame", () => {
+  const { newGames, newP1Wins, newP2Wins } = advanceDiracGame({
+    nextPlayer: 0,
+    scores: [0, 0],
+    positions: [4, 8],
+    copies: 1,
+  });
+  assertEquals(newP1Wins, 0);
+  assertEquals(newP2Wins, 0);
+  assertEquals(newGames, [
+    {
+      nextPlayer: 1,
+      scores: [7, 0],
+      positions: [7, 8],
+      copies: 1,
+    },
+    {
+      nextPlayer: 1,
+      scores: [8, 0],
+      positions: [8, 8],
+      copies: 3,
+    },
+    {
+      nextPlayer: 1,
+      scores: [9, 0],
+      positions: [9, 8],
+      copies: 6,
+    },
+    {
+      nextPlayer: 1,
+      scores: [10, 0],
+      positions: [10, 8],
+      copies: 7,
+    },
+    {
+      nextPlayer: 1,
+      scores: [1, 0],
+      positions: [1, 8],
+      copies: 6,
+    },
+    {
+      nextPlayer: 1,
+      scores: [2, 0],
+      positions: [2, 8],
+      copies: 3,
+    },
+    {
+      nextPlayer: 1,
+      scores: [3, 0],
+      positions: [3, 8],
+      copies: 1,
+    },
+  ]);
+});
+
+Deno.test({
+  name: "day21/solves part 2",
+  ignore: true,
+  fn: () => {
+    // test input
+    assertEquals(solvePart2(4, 8), 444356092776315);
+    // real input
+    assertEquals(solvePart2(3, 10), -1);
   },
 });
