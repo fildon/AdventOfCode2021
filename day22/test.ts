@@ -1,6 +1,7 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
 import {
   applyInstruction,
+  combine,
   inInitializationRegion,
   Instruction,
   parse,
@@ -104,7 +105,6 @@ Deno.test({
   fn: () => {
     assertEquals(solvePart1("day22/smalltestinput.txt"), 39);
     assertEquals(solvePart1("day22/testinput.txt"), 590784);
-    // TODO
-    // assertEquals(solvePart1("day22/input.txt"), -1);
+    assertEquals(solvePart1("day22/input.txt"), 610196);
   },
 });

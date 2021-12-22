@@ -111,13 +111,13 @@ const getNegatives = (
   // The set of all points with lesser x value
   [[-Infinity, xMin - 1], [-Infinity, Infinity], [-Infinity, Infinity]],
   // Equal x range, but all y values greater
-  [[xMax, xMax], [yMax + 1, Infinity], [-Infinity, Infinity]],
+  [[xMin, xMax], [yMax + 1, Infinity], [-Infinity, Infinity]],
   // Equal x range, but all y values lesser
-  [[xMax, xMax], [-Infinity, yMin - 1], [-Infinity, Infinity]],
+  [[xMin, xMax], [-Infinity, yMin - 1], [-Infinity, Infinity]],
   // Equal x and y ranges, but all z values greater
-  [[xMax, xMax], [yMin, yMax], [zMax + 1, Infinity]],
+  [[xMin, xMax], [yMin, yMax], [zMax + 1, Infinity]],
   // Equal x and y ranges, but all z values lesser
-  [[xMax, xMax], [yMin, yMax], [-Infinity, zMin - 1]],
+  [[xMin, xMax], [yMin, yMax], [-Infinity, zMin - 1]],
 ];
 
 /**
@@ -143,7 +143,7 @@ const intersect = ([[aXMin, aXMax], [aYMin, aYMax], [aZMin, aZMax]]: Cuboid) =>
 /**
  * Transforms the given cuboid in accordance with the given instruction
  */
-const combine = (instruction: Instruction) =>
+export const combine = (instruction: Instruction) =>
   (cuboid: Cuboid): Cuboid[] => {
     // If the instruction does not overlap at all with the cuboid, then the cuboid is unaffected
     if (!overlaps(cuboid, instruction.cuboid)) return [cuboid];
@@ -192,7 +192,5 @@ const sum = (acc: number, curr: number) => acc + curr;
 export const solvePart1 = (filePath: string) =>
   getInputStrings(filePath).filter((str) => str.length > 0).map(parse).filter((
     instruction,
-  ) => inInitializationRegion(instruction.cuboid)).reduce(
-    applyInstruction,
-    [], // Initially 'empty' reactor
-  ).map(sizeOf).reduce(sum);
+  ) => inInitializationRegion(instruction.cuboid)).reduce(applyInstruction, [])
+    .map(sizeOf).reduce(sum);
