@@ -1,13 +1,13 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
 import {
   applyInstruction,
-  combine,
   inInitializationRegion,
   Instruction,
   parse,
   Reactor,
   sizeOf,
   solvePart1,
+  solvePart2,
 } from "./reactor.ts";
 
 Deno.test("day22/parse instruction", () => {
@@ -107,4 +107,9 @@ Deno.test({
     assertEquals(solvePart1("day22/testinput.txt"), 590784);
     assertEquals(solvePart1("day22/input.txt"), 610196);
   },
+});
+
+Deno.test("day22/solves part 2", () => {
+  assertEquals(solvePart2("day22/part2testinput.txt"), 2758514936282235);
+  assertEquals(solvePart2("day22/input.txt"), 1282401587270826);
 });

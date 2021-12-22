@@ -194,3 +194,10 @@ export const solvePart1 = (filePath: string) =>
     instruction,
   ) => inInitializationRegion(instruction.cuboid)).reduce(applyInstruction, [])
     .map(sizeOf).reduce(sum);
+
+export const solvePart2 = (filePath: string) =>
+  getInputStrings(filePath).filter((str) => str.length > 0).map(parse).reduce(
+    applyInstruction,
+    [],
+  )
+    .map(sizeOf).reduce(sum);
