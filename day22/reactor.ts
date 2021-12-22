@@ -44,7 +44,7 @@ const toRange = (rangeString: string) => {
   return numbers;
 };
 
-const parse = (instruction: string): Instruction => {
+export const parse = (instruction: string): Instruction => {
   const [command, location] = instruction.split(" ");
 
   if (command !== "on" && command !== "off") {
@@ -57,9 +57,6 @@ const parse = (instruction: string): Instruction => {
 
   return { command, cuboid };
 };
-
-export const parseInstructions = (instructions: Array<string>) =>
-  instructions.map(parse);
 
 export const inInitializationRegion = (
   cuboid: Cuboid,
@@ -103,37 +100,63 @@ const containedBy = (a: Cuboid, b: Cuboid) =>
   rangeContainedBy(a[2], b[2]);
 
 /**
+ * Given a cuboid, returns a collection of cuboids which collectively represent the set of all
+ * 3D points _not_ in the given cuboid.
+ */
+const getNegatives = (
+  [[xMin, xMax], [yMin, yMax], [zMin, zMax]]: Cuboid,
+): Array<Cuboid> => [
+  // The set of all points with greater x value
+  [[xMax + 1, Infinity], [-Infinity, Infinity], [-Infinity, Infinity]],
+  // The set of all points with lesser x value
+  [[-Infinity, xMin - 1], [-Infinity, Infinity], [-Infinity, Infinity]],
+  // Equal x range, but all y values greater
+  [[xMax, xMax], [yMax + 1, Infinity], [-Infinity, Infinity]],
+  // Equal x range, but all y values lesser
+  [[xMax, xMax], [-Infinity, yMin - 1], [-Infinity, Infinity]],
+  // Equal x and y ranges, but all z values greater
+  [[xMax, xMax], [yMin, yMax], [zMax + 1, Infinity]],
+  // Equal x and y ranges, but all z values lesser
+  [[xMax, xMax], [yMin, yMax], [-Infinity, zMin - 1]],
+];
+
+/**
+ * Returns the intersection of two cuboids, or undefined if there is no intersection
+ */
+const intersect = ([[aXMin, aXMax], [aYMin, aYMax], [aZMin, aZMax]]: Cuboid) =>
+  (
+    [[bXMin, bXMax], [bYMin, bYMax], [bZMin, bZMax]]: Cuboid,
+  ): Cuboid | undefined => {
+    const intersection: Cuboid = [
+      [Math.max(aXMin, bXMin), Math.min(aXMax, bXMax)],
+      [Math.max(aYMin, bYMin), Math.min(aYMax, bYMax)],
+      [Math.max(aZMin, bZMin), Math.min(aZMax, bZMax)],
+    ];
+
+    // If this intersection was valid, then we return it
+    if (intersection.every(([min, max]) => max >= min)) return intersection;
+
+    // In this case however no valid intersection was found
+    return undefined;
+  };
+
+/**
  * Transforms the given cuboid in accordance with the given instruction
- *
- * If the instruction does not overlap at all with the cuboid, then the cuboid is unaffected
- *
- * If the cuboid is fully contained in the instruction then the cuboid is fully removed
- *
- * If the cuboid is partially overlapping with the instruction then it is broken apart into non-overlapping cuboids
  */
 const combine = (instruction: Instruction) =>
   (cuboid: Cuboid): Cuboid[] => {
+    // If the instruction does not overlap at all with the cuboid, then the cuboid is unaffected
     if (!overlaps(cuboid, instruction.cuboid)) return [cuboid];
+    // If the cuboid is fully contained in the instruction then the cuboid is fully removed
     if (containedBy(cuboid, instruction.cuboid)) return [];
-
     /**
-     * TODO this is the hard part :-D
-     * This cuboid needs to be broken apart into sub-cuboids
-     * which have no overlap with the given instruction
+     * If the cuboid is partially overlapping with the instruction then it is broken apart into non-overlapping cuboids
      *
-     * The intersection might be 0-faced, 1-faced, 2-faced, or 3-faced
-     *
-     * 0-faced intersection means the instruction is fully inside the cuboid.
-     *
-     * 3-faced => 7 resulting cuboids
-     *
-     * 2-faced => 3 resulting cuboids
-     *
-     * 1-faced => 3 or 5 resulting cuboids
-     *
-     * 0-faced => 6 resulting cuboids
+     * This is computed as the intersection of cuboid with the _negation_ of the instruction's cuboid
      */
-    return [];
+    return getNegatives(instruction.cuboid).map(intersect(cuboid)).filter((
+      c,
+    ): c is Cuboid => !!c);
   };
 
 /**
@@ -167,9 +190,9 @@ export const sizeOf = (
 const sum = (acc: number, curr: number) => acc + curr;
 
 export const solvePart1 = (filePath: string) =>
-  parseInstructions(getInputStrings(filePath)).filter((instruction) =>
-    inInitializationRegion(instruction.cuboid)
-  ).reduce(
+  getInputStrings(filePath).filter((str) => str.length > 0).map(parse).filter((
+    instruction,
+  ) => inInitializationRegion(instruction.cuboid)).reduce(
     applyInstruction,
     [], // Initially 'empty' reactor
   ).map(sizeOf).reduce(sum);

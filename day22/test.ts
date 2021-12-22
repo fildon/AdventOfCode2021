@@ -3,54 +3,25 @@ import {
   applyInstruction,
   inInitializationRegion,
   Instruction,
-  parseInstructions,
+  parse,
   Reactor,
   sizeOf,
   solvePart1,
 } from "./reactor.ts";
 
-Deno.test("day22/parses input", () => {
+Deno.test("day22/parse instruction", () => {
   assertEquals(
-    parseInstructions([
+    parse(
       "on x=10..12,y=10..12,z=10..12",
-      "on x=11..13,y=11..13,z=11..13",
-      "off x=9..11,y=9..11,z=9..11",
-      "on x=10..10,y=10..10,z=10..10",
-    ]),
-    [
-      {
-        command: "on",
-        cuboid: [
-          [10, 12],
-          [10, 12],
-          [10, 12],
-        ],
-      },
-      {
-        command: "on",
-        cuboid: [
-          [11, 13],
-          [11, 13],
-          [11, 13],
-        ],
-      },
-      {
-        command: "off",
-        cuboid: [
-          [9, 11],
-          [9, 11],
-          [9, 11],
-        ],
-      },
-      {
-        command: "on",
-        cuboid: [
-          [10, 10],
-          [10, 10],
-          [10, 10],
-        ],
-      },
-    ],
+    ),
+    {
+      command: "on",
+      cuboid: [
+        [10, 12],
+        [10, 12],
+        [10, 12],
+      ],
+    },
   );
 });
 
@@ -76,7 +47,7 @@ Deno.test("day22/sizeOf cuboid", () => {
 
 Deno.test({
   name: "day22/applies non-overlapping on-command",
-  ignore: true,
+  ignore: false,
   fn: () => {
     const reactor = [[
       [1, 2],
@@ -92,23 +63,23 @@ Deno.test({
       ],
     } as Instruction;
     assertEquals(applyInstruction(reactor, nonOverlappingInstruction), [
-      {
-        xRange: [1, 2],
-        yRange: [1, 2],
-        zRange: [1, 2],
-      },
-      {
-        xRange: [3, 4],
-        yRange: [1, 2],
-        zRange: [1, 2],
-      },
+      [
+        [1, 2],
+        [1, 2],
+        [1, 2],
+      ],
+      [
+        [3, 4],
+        [1, 2],
+        [1, 2],
+      ],
     ]);
   },
 });
 
 Deno.test({
   name: "day22/ignores non-overlapping off-command",
-  ignore: true,
+  ignore: false,
   fn: () => {
     const reactor = [[
       [1, 2],
@@ -128,27 +99,12 @@ Deno.test({
 });
 
 Deno.test({
-  name: "day22/applies overlapping on-command",
-  ignore: true,
-  fn: () => {
-    // TODO
-    assertEquals(true, false);
-  },
-});
-
-Deno.test({
-  name: "day22/applies overlapping off-command",
-  ignore: true,
-  fn: () => {
-    // TODO
-    assertEquals(true, false);
-  },
-});
-
-Deno.test({
   name: "day22/solves part 1",
-  ignore: true,
+  ignore: false,
   fn: () => {
+    assertEquals(solvePart1("day22/smalltestinput.txt"), 39);
     assertEquals(solvePart1("day22/testinput.txt"), 590784);
+    // TODO
+    // assertEquals(solvePart1("day22/input.txt"), -1);
   },
 });
