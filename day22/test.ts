@@ -56,17 +56,13 @@ Deno.test("day22/parses input", () => {
 
 Deno.test("day22/inInitializationRegion", () => {
   assertEquals(
-    inInitializationRegion({
-      command: "on",
-      cuboid: [[10, 50], [-49, 12], [0, -1]],
-    }),
+    inInitializationRegion([[10, 50], [-49, 12], [0, -1]]),
     true,
   );
   assertEquals(
-    inInitializationRegion({
-      command: "off",
-      cuboid: [[51, 12], [0, 0], [5, 12]],
-    }),
+    inInitializationRegion(
+      [[51, 12], [0, 0], [5, 12]],
+    ),
     false,
   );
 });
@@ -79,8 +75,8 @@ Deno.test("day22/sizeOf cuboid", () => {
 });
 
 Deno.test({
-  name: "day22/applies non-overlapping on command",
-  ignore: false,
+  name: "day22/applies non-overlapping on-command",
+  ignore: true,
   fn: () => {
     const reactor = [[
       [1, 2],
@@ -111,7 +107,7 @@ Deno.test({
 });
 
 Deno.test({
-  name: "day22/ignores non-overlapping off command",
+  name: "day22/ignores non-overlapping off-command",
   ignore: true,
   fn: () => {
     const reactor = [[
@@ -132,7 +128,7 @@ Deno.test({
 });
 
 Deno.test({
-  name: "day22/applies overlapping on command",
+  name: "day22/applies overlapping on-command",
   ignore: true,
   fn: () => {
     // TODO
@@ -141,7 +137,7 @@ Deno.test({
 });
 
 Deno.test({
-  name: "day22/applies overlapping off command",
+  name: "day22/applies overlapping off-command",
   ignore: true,
   fn: () => {
     // TODO
