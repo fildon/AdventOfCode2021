@@ -6,28 +6,32 @@ import { getInputStrings } from "../utils/inputparsing.ts";
  */
 type Range = [number, number];
 
-type Cuboid = {
-  xRange: [number, number];
-  yRange: [number, number];
-  zRange: [number, number];
-};
+/**
+ * A cuboid as [XRange, YRange, ZRange]
+ */
+type Cuboid = [Range, Range, Range];
 
 /**
  * A single reactor instruction
  */
-type Instruction = {
+export type Instruction = {
   command: "on" | "off";
   cuboid: Cuboid;
 };
 
 /**
  * We represent the Reactor's state solely in terms of "on" cuboids
+ *
+ * The regions are assumed to always be non-overlapping
  */
-type Reactor = Array<Cuboid>;
+export type Reactor = Array<Cuboid>;
 
 const isRange = (numbers: unknown): numbers is Range =>
   Array.isArray(numbers) && numbers.length === 2 &&
   typeof numbers[0] === "number" && typeof numbers[1] === "number";
+
+const isCuboid = (ranges: unknown): ranges is Cuboid =>
+  Array.isArray(ranges) && ranges.length === 3 && ranges.every(isRange);
 
 /**
  * Converts a string of form "x=10..12" to a range of form [10, 12]
@@ -47,10 +51,11 @@ const parse = (instruction: string): Instruction => {
     throw new Error("unrecognised command");
   }
 
-  const [xRange, yRange, zRange] = location.split(",")
+  const cuboid = location.split(",")
     .map(toRange);
+  if (!isCuboid(cuboid)) throw new Error("Parse error in cuboid");
 
-  return { command, cuboid: { xRange, yRange, zRange } };
+  return { command, cuboid };
 };
 
 export const parseInstructions = (instructions: Array<string>) =>
@@ -58,26 +63,19 @@ export const parseInstructions = (instructions: Array<string>) =>
 
 export const inInitializationRegion = (
   {
-    cuboid: {
-      xRange: [xMin, xMax],
-      yRange: [yMin, yMax],
-      zRange: [zMin, zMax],
-    },
+    cuboid,
   }: Instruction,
 ) => {
-  if (xMin > 50) return false;
-  if (xMax < -50) return false;
-  if (yMin > 50) return false;
-  if (yMax < -50) return false;
-  if (zMin > 50) return false;
-  if (zMax < -50) return false;
+  // Reject any cuboid that is fully outside the initialization region
+  if (cuboid.some(([min, max]) => min > 50 || max < -50)) return false;
+
   /**
    * I assume instructions are either fully in or fully out of the
    * initialization region. If there are any counter examples I want
    * to know about it.
    */
   if (
-    [xMin, xMax, yMin, yMax, zMin, zMax].some((val) => val < -50 || 50 < val)
+    cuboid.some(([min, max]) => min < -50 || 50 < max)
   ) {
     throw new Error(
       "Found instruction that is only partially in the initialization region",
@@ -90,13 +88,23 @@ export const applyInstruction = (
   reactor: Reactor,
   instruction: Instruction,
 ): Reactor => {
-  // TODO
+  /**
+   * TODO if this new cuboid does not overlap with any other cuboid
+   * then add it if and only if it is 'on' otherwise ignore it
+   */
+  /**
+   * TODO if there is any overlap, then break up the overlapped regions
+   * into a collection of non-overlapping regions
+   */
+  // OPTIONAL: merge contiguous cuboids where possible
   throw new Error("not implemented");
 };
 
+const product = (acc: number, curr: number) => acc * curr;
+
 export const sizeOf = (
-  { xRange: [xMin, xMax], yRange: [yMin, yMax], zRange: [zMin, zMax] }: Cuboid,
-) => (xMax - xMin + 1) * (yMax - yMin + 1) * (zMax - zMin + 1);
+  cuboid: Cuboid,
+) => cuboid.map(([min, max]) => max - min + 1).reduce(product);
 
 const countSizes = (count: number, cuboid: Cuboid) => count + sizeOf(cuboid);
 

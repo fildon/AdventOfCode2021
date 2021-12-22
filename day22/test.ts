@@ -2,7 +2,9 @@ import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
 import {
   applyInstruction,
   inInitializationRegion,
+  Instruction,
   parseInstructions,
+  Reactor,
   sizeOf,
   solvePart1,
 } from "./reactor.ts";
@@ -18,35 +20,35 @@ Deno.test("day22/parses input", () => {
     [
       {
         command: "on",
-        cuboid: {
-          xRange: [10, 12],
-          yRange: [10, 12],
-          zRange: [10, 12],
-        },
+        cuboid: [
+          [10, 12],
+          [10, 12],
+          [10, 12],
+        ],
       },
       {
         command: "on",
-        cuboid: {
-          xRange: [11, 13],
-          yRange: [11, 13],
-          zRange: [11, 13],
-        },
+        cuboid: [
+          [11, 13],
+          [11, 13],
+          [11, 13],
+        ],
       },
       {
         command: "off",
-        cuboid: {
-          xRange: [9, 11],
-          yRange: [9, 11],
-          zRange: [9, 11],
-        },
+        cuboid: [
+          [9, 11],
+          [9, 11],
+          [9, 11],
+        ],
       },
       {
         command: "on",
-        cuboid: {
-          xRange: [10, 10],
-          yRange: [10, 10],
-          zRange: [10, 10],
-        },
+        cuboid: [
+          [10, 10],
+          [10, 10],
+          [10, 10],
+        ],
       },
     ],
   );
@@ -56,14 +58,14 @@ Deno.test("day22/inInitializationRegion", () => {
   assertEquals(
     inInitializationRegion({
       command: "on",
-      cuboid: { xRange: [10, 50], yRange: [-49, 12], zRange: [0, -1] },
+      cuboid: [[10, 50], [-49, 12], [0, -1]],
     }),
     true,
   );
   assertEquals(
     inInitializationRegion({
       command: "off",
-      cuboid: { xRange: [51, 12], yRange: [0, 0], zRange: [5, 12] },
+      cuboid: [[51, 12], [0, 0], [5, 12]],
     }),
     false,
   );
@@ -71,21 +73,79 @@ Deno.test("day22/inInitializationRegion", () => {
 
 Deno.test("day22/sizeOf cuboid", () => {
   assertEquals(
-    sizeOf({ xRange: [0, 2], yRange: [-1, 3], zRange: [-4, -2] }),
+    sizeOf([[0, 2], [-1, 3], [-4, -2]]),
     3 * 5 * 3,
   );
 });
 
 Deno.test({
-  name: "day22/applies instruction",
+  name: "day22/applies non-overlapping on command",
+  ignore: false,
+  fn: () => {
+    const reactor = [[
+      [1, 2],
+      [1, 2],
+      [1, 2],
+    ]] as Reactor;
+    const nonOverlappingInstruction = {
+      command: "on" as const,
+      cuboid: [
+        [3, 4],
+        [1, 2],
+        [1, 2],
+      ],
+    } as Instruction;
+    assertEquals(applyInstruction(reactor, nonOverlappingInstruction), [
+      {
+        xRange: [1, 2],
+        yRange: [1, 2],
+        zRange: [1, 2],
+      },
+      {
+        xRange: [3, 4],
+        yRange: [1, 2],
+        zRange: [1, 2],
+      },
+    ]);
+  },
+});
+
+Deno.test({
+  name: "day22/ignores non-overlapping off command",
+  ignore: true,
+  fn: () => {
+    const reactor = [[
+      [1, 2],
+      [1, 2],
+      [1, 2],
+    ]] as Reactor;
+    const nonOverlappingInstruction = {
+      command: "off" as const,
+      cuboid: [
+        [3, 4],
+        [1, 2],
+        [1, 2],
+      ],
+    } as Instruction;
+    assertEquals(applyInstruction(reactor, nonOverlappingInstruction), reactor);
+  },
+});
+
+Deno.test({
+  name: "day22/applies overlapping on command",
   ignore: true,
   fn: () => {
     // TODO
-    const reactor = [{
-      xRange: [1, 2],
-      yRange: [1, 2],
-      zRange: [1, 2],
-    }];
+    assertEquals(true, false);
+  },
+});
+
+Deno.test({
+  name: "day22/applies overlapping off command",
+  ignore: true,
+  fn: () => {
+    // TODO
+    assertEquals(true, false);
   },
 });
 
