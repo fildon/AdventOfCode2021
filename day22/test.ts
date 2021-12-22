@@ -3,6 +3,7 @@ import {
   applyInstruction,
   inInitializationRegion,
   parseInstructions,
+  sizeOf,
   solvePart1,
 } from "./reactor.ts";
 
@@ -65,6 +66,13 @@ Deno.test("day22/inInitializationRegion", () => {
       cuboid: { xRange: [51, 12], yRange: [0, 0], zRange: [5, 12] },
     }),
     false,
+  );
+});
+
+Deno.test("day22/sizeOf cuboid", () => {
+  assertEquals(
+    sizeOf({ xRange: [0, 2], yRange: [-1, 3], zRange: [-4, -2] }),
+    3 * 5 * 3,
   );
 });
 

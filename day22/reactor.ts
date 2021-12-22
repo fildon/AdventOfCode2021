@@ -94,15 +94,11 @@ export const applyInstruction = (
   throw new Error("not implemented");
 };
 
-const sizeOf = (cuboid: Cuboid) => {
-  // TODO
-  return 0;
-};
+export const sizeOf = (
+  { xRange: [xMin, xMax], yRange: [yMin, yMax], zRange: [zMin, zMax] }: Cuboid,
+) => (xMax - xMin + 1) * (yMax - yMin + 1) * (zMax - zMin + 1);
 
-const countSizes = (count: number, cuboid: Cuboid) => {
-  // TODO
-  return 0;
-};
+const countSizes = (count: number, cuboid: Cuboid) => count + sizeOf(cuboid);
 
 export const solvePart1 = (filePath: string) =>
   parseInstructions(getInputStrings(filePath)).filter(
