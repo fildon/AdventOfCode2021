@@ -8,7 +8,7 @@ import { getInputStrings } from "../utils/inputparsing.ts";
  * Hallway locations are H00 - H10 (reading left to right)
  *
  * Burrow locatinos are A1, A2, B1, B2 ... etc.
- * With A1 being 'higher' than A2
+ * With A1 being 'higher' (closer to the hallway) than A2
  *
  * ```txt
  * #############
@@ -223,9 +223,47 @@ const aStarSearch = (start: Burrows) => {
   throw new Error("Failed to reach goal!");
 };
 
-const parseInput = (inputStrings: Array<string>): Burrows => {
-  // TODO
-  throw new Error("not implemented");
+export const parseInput = (inputStrings: Array<string>): Burrows => {
+  const amphipods = [
+    inputStrings[2][3],
+    inputStrings[2][5],
+    inputStrings[2][7],
+    inputStrings[2][9],
+    inputStrings[3][3],
+    inputStrings[3][5],
+    inputStrings[3][7],
+    inputStrings[3][9],
+  ].join("");
+
+  const locations: Array<Location> = [
+    "A1",
+    "B1",
+    "C1",
+    "D1",
+    "A2",
+    "B2",
+    "C2",
+    "D2",
+  ];
+
+  return {
+    a: [
+      locations[amphipods.indexOf("A")],
+      locations[amphipods.lastIndexOf("A")],
+    ],
+    b: [
+      locations[amphipods.indexOf("B")],
+      locations[amphipods.lastIndexOf("B")],
+    ],
+    c: [
+      locations[amphipods.indexOf("C")],
+      locations[amphipods.lastIndexOf("C")],
+    ],
+    d: [
+      locations[amphipods.indexOf("D")],
+      locations[amphipods.lastIndexOf("D")],
+    ],
+  };
 };
 
 export const solvePart1 = (filePath: string) =>
