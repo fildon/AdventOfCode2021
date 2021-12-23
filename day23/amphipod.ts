@@ -140,8 +140,24 @@ export const distance = (x: Location, y: Location) => {
  * Heuristic cost function, estimating the cost to get to the goal
  */
 const hCost = (state: Burrows) => {
-  // TODO
-  return -1;
+  const aCost = Math.min(
+    distance(state.a[0], "A1") + distance(state.a[1], "A2"),
+    distance(state.a[1], "A1") + distance(state.a[0], "A2"),
+  );
+  const bCost = Math.min(
+    distance(state.b[0], "B1") + distance(state.b[1], "B2"),
+    distance(state.b[1], "B1") + distance(state.b[0], "B2"),
+  );
+  const cCost = Math.min(
+    distance(state.c[0], "C1") + distance(state.c[1], "C2"),
+    distance(state.c[1], "C1") + distance(state.c[0], "C2"),
+  );
+  const dCost = Math.min(
+    distance(state.d[0], "D1") + distance(state.d[1], "D2"),
+    distance(state.d[1], "D1") + distance(state.d[0], "D2"),
+  );
+
+  return aCost + bCost + cCost + dCost;
 };
 
 /**
@@ -152,7 +168,9 @@ const getNeighbours = (current: Burrows): Array<{
   cost: number;
   state: Burrows;
 }> => {
-  // TODO
+  // TODO flat map over all amphipods
+  // TODO get the set of all places they can get to
+  // TODO and the cost to get there (multiplying by amphipod cost as appropriate)
   return [];
 };
 
