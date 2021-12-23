@@ -39,7 +39,10 @@ type Location =
   | "D1"
   | "D2";
 
-const adjacencyMap: Record<Location, Array<Location>> = {
+/**
+ * Given a location, which other locations are adjacent?
+ */
+export const adjacencyMap: Record<Location, Array<Location>> = {
   H00: ["H01"],
   H01: ["H00", "H02"],
   H02: ["H01", "H03", "A1"],
@@ -77,16 +80,51 @@ export type Burrows = {
  *
  * Note that we need a canonical ordering to ignore order differences in the input
  *
- * The choice of canonical order in particular doesn't matter... so long as there is one
+ * The choice of canonical order in particular doesn't matter... so long as it is consistent
  */
 const serializeLocations = ([x, y]: [Location, Location]) =>
   [x, y].sort((a, b) => a.localeCompare(b)).join("");
 
+/**
+ * Serialize a burrows state.
+ *
+ * The particular choice of serialization is not important, so long as it is
+ * bijective. But remember that we don't distinguish states with differently ordered pairs
+ */
 const serialize = ({ a, b, c, d }: Burrows) =>
   [a, b, c, d].map(serializeLocations).join("");
 
 export const equals = (a: Burrows) =>
   (b: Burrows) => serialize(a) === serialize(b);
+
+/**
+ * The shortest path distance from x to y
+ */
+export const distance = (x: Location, y: Location) => {
+  if (x === y) return 0;
+  if (adjacencyMap[x].includes(y)) return 1;
+
+  // The following implements a breadth first search for distance
+  const visited = new Set<Location>([x]);
+  let distance = 0;
+  while (!visited.has(y)) {
+    // Get the set of all neighbours to currently visited locations
+    // Excluding any visited already
+    const newVisited = [...visited.values()].flatMap((location) =>
+      adjacencyMap[location]
+    ).filter((location) => !visited.has(location));
+
+    if (newVisited.length === 0) {
+      // We are not able to progress towards our destination.
+      // This can only happen if there is no path between x and y
+      return Infinity;
+    }
+
+    newVisited.forEach((location) => visited.add(location));
+    distance++;
+  }
+  return distance;
+};
 
 /**
  * Heuristic cost function, estimating the cost to get from state 'a' to state 'b'
@@ -111,13 +149,15 @@ const getNeighbours = (current: Burrows): Array<{
 };
 
 /**
- * Key-value store from states to costs
+ * Key-value store from burrow states to costs
  */
-const buildLocationCostMap = () => {
-  // TODO
+const burrowCostStore = () => {
+  const map: Partial<Record<string, number>> = {};
   return {
-    get: (burrows: Burrows) => Infinity,
-    set: (burrows: Burrows, cost: number) => {},
+    get: (burrows: Burrows) => map[serialize(burrows)] ?? Infinity,
+    set: (burrows: Burrows, cost: number) => {
+      map[serialize(burrows)] = cost;
+    },
   };
 };
 
@@ -142,11 +182,11 @@ const aStarSearch = (start: Burrows) => {
   const openSet: Array<Burrows> = [start];
 
   // Set from states to cost _to reach that point from the start_
-  const gScore = buildLocationCostMap();
+  const gScore = burrowCostStore();
   gScore.set(start, 0);
 
   // Set from states to current best estimate for total cost of a complete path through that state
-  const fScore = buildLocationCostMap();
+  const fScore = burrowCostStore();
   fScore.set(start, hCost(start, goal));
 
   while (openSet.length > 0) {

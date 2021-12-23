@@ -1,5 +1,11 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { Burrows, equals, solvePart1 } from "./amphipod.ts";
+import {
+  adjacencyMap,
+  Burrows,
+  distance,
+  equals,
+  solvePart1,
+} from "./amphipod.ts";
 
 Deno.test("day23/burrow equality", () => {
   const x: Burrows = {
@@ -24,8 +30,15 @@ Deno.test("day23/burrow equality", () => {
   // x is not equal to y
   assertEquals(equals(x)(y), false);
 
-  // x _is_ equal to z, but they have different orderings
+  // x _is_ equal to z, even though they have different orderings
   assertEquals(equals(x)(z), true);
+});
+
+Deno.test("day23/distance", () => {
+  assertEquals(distance("H02", "H02"), 0);
+  assertEquals(distance("H02", "H03"), 1);
+  assertEquals(distance("A1", "H03"), 2);
+  assertEquals(distance("A2", "H10"), 10);
 });
 
 Deno.test({
