@@ -161,18 +161,68 @@ const hCost = (state: Burrows) => {
 };
 
 /**
+ * Given a state and specific amphipod, which adjacent states are reachable
+ * by moving that amphipod once
+ */
+const getNeighboursFor = (
+  state: Burrows,
+) =>
+  (
+    start: Location,
+  ): Array<{ cost: number; state: Burrows }> => {
+    const results: Array<{ cost: number; state: Burrows }> = [];
+
+    const amphipodType = state.a.includes(start)
+      ? "A"
+      : state.b.includes(start)
+      ? "B"
+      : state.c.includes(start)
+      ? "C"
+      : "D";
+
+    // breadth first walk out from starting location
+    const visited = new Set<Location>([start]);
+    let distance = 0;
+    while (true) {
+      // Take a step in every direction
+      distance++;
+      const newVisited = [...visited.values()].flatMap((location) =>
+        adjacencyMap[location]
+      ).filter((location) => !visited.has(location)).filter((location) => {
+        // Never stop in someone else's location
+        ![...state.a, ...state.b, ...state.c, ...state.d].includes(location);
+      });
+
+      // We have exhausted all possibilities
+      if (newVisited.length === 0) return results;
+
+      // We haven't exhausted all possibilities!
+      newVisited.forEach((location) => visited.add(location));
+      newVisited.filter((location) =>
+        // Never stop in the hallway in front of a room
+        !["H02", "H04", "H06", "H08"].includes(location)
+      ).filter((location) => {
+        // If start is a hallway, we must move into destination
+        if (!["H02", "H04", "H06", "H08"].includes(start)) return true;
+        return (location as string).includes(amphipodType);
+      }).forEach((location) => {
+        const cost = { A: 1, B: 10, C: 100, D: 1000 }[amphipodType] * distance;
+        // TODO add new result in here
+      });
+    }
+  };
+
+/**
  * Given a burrows state, returns all states we can get to from here
  * in one move, and additionally return how much the given move cost
  */
 const getNeighbours = (current: Burrows): Array<{
   cost: number;
   state: Burrows;
-}> => {
-  // TODO flat map over all amphipods
-  // TODO get the set of all places they can get to
-  // TODO and the cost to get there (multiplying by amphipod cost as appropriate)
-  return [];
-};
+}> =>
+  [...current.a, ...current.b, ...current.c, ...current.d].flatMap(
+    getNeighboursFor(current),
+  );
 
 /**
  * Key-value store from burrow states to costs
