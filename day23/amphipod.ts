@@ -1,17 +1,92 @@
 import { getInputStrings } from "../utils/inputparsing.ts";
 
 /**
- * Models the full state of amphipod locations at some given point in time
+ * There are 19 possible locations
+ *
+ * We denote each location with a string
+ *
+ * Hallway locations are H00 - H10 (reading left to right)
+ *
+ * Burrow locatinos are A1, A2, B1, B2 ... etc.
+ * With A1 being 'higher' than A2
+ *
+ * ```txt
+ * #############
+ * #...........#
+ * ###.#.#.#.###
+ *   #.#.#.#.#
+ *   #########
+ * ```
  */
-type Burrows = {
-  // TODO
+type Location =
+  | "H00"
+  | "H01"
+  | "H02"
+  | "H03"
+  | "H04"
+  | "H05"
+  | "H06"
+  | "H07"
+  | "H08"
+  | "H09"
+  | "H10"
+  | "A1"
+  | "A2"
+  | "B1"
+  | "B2"
+  | "C1"
+  | "C2"
+  | "D1"
+  | "D2";
+
+const adjacencyMap: Record<Location, Array<Location>> = {
+  H00: ["H01"],
+  H01: ["H00", "H02"],
+  H02: ["H01", "H03", "A1"],
+  H03: ["H02", "H04"],
+  H04: ["H03", "H05", "B1"],
+  H05: ["H04", "H06"],
+  H06: ["H05", "H07", "C1"],
+  H07: ["H06", "H08"],
+  H08: ["H07", "H09", "D1"],
+  H09: ["H08", "H10"],
+  H10: ["H09"],
+  A1: ["A2", "H02"],
+  A2: ["A1"],
+  B1: ["B2", "H04"],
+  B2: ["B1"],
+  C1: ["C2", "H06"],
+  C2: ["C1"],
+  D1: ["D2", "H08"],
+  D2: ["D1"],
 };
 
-const equals = (a: Burrows) =>
-  (b: Burrows) => {
-    // TODO
-    return false;
-  };
+/**
+ * Models the full state of amphipod locations at some given point in time
+ */
+export type Burrows = {
+  // State is fully defined by the set of locations of all amphipods
+  a: [Location, Location];
+  b: [Location, Location];
+  c: [Location, Location];
+  d: [Location, Location];
+};
+
+/**
+ * Serialize a location pair
+ *
+ * Note that we need a canonical ordering to ignore order differences in the input
+ *
+ * The choice of canonical order in particular doesn't matter... so long as there is one
+ */
+const serializeLocations = ([x, y]: [Location, Location]) =>
+  [x, y].sort((a, b) => a.localeCompare(b)).join("");
+
+const serialize = ({ a, b, c, d }: Burrows) =>
+  [a, b, c, d].map(serializeLocations).join("");
+
+export const equals = (a: Burrows) =>
+  (b: Burrows) => serialize(a) === serialize(b);
 
 /**
  * Heuristic cost function, estimating the cost to get from state 'a' to state 'b'
@@ -41,8 +116,8 @@ const getNeighbours = (current: Burrows): Array<{
 const buildLocationCostMap = () => {
   // TODO
   return {
-    get: (burrows: Burrows) => 0,
-    set: (burrows: Burrows, cost: number) => buildLocationCostMap(),
+    get: (burrows: Burrows) => Infinity,
+    set: (burrows: Burrows, cost: number) => {},
   };
 };
 
@@ -58,14 +133,21 @@ const buildLocationCostMap = () => {
  * We'll borrow a lot of the aStar implementation from day15
  */
 const aStarSearch = (start: Burrows) => {
-  const goal: Burrows = {};
+  const goal: Burrows = {
+    a: ["A1", "A2"],
+    b: ["B1", "B2"],
+    c: ["C1", "C2"],
+    d: ["D1", "D2"],
+  };
   const openSet: Array<Burrows> = [start];
 
   // Set from states to cost _to reach that point from the start_
-  let gScore = buildLocationCostMap().set(start, 0);
+  const gScore = buildLocationCostMap();
+  gScore.set(start, 0);
 
   // Set from states to current best estimate for total cost of a complete path through that state
-  let fScore = buildLocationCostMap().set(start, hCost(start, goal));
+  const fScore = buildLocationCostMap();
+  fScore.set(start, hCost(start, goal));
 
   while (openSet.length > 0) {
     // Pops off the lowest fScore openSet member
@@ -84,10 +166,10 @@ const aStarSearch = (start: Burrows) => {
       if (tentativeGScore >= previousScoreForNeighbour) return;
 
       // Update path costs
-      gScore = gScore.set(neighbour, tentativeGScore);
-      fScore = fScore.set(
-        neighbour,
-        tentativeGScore + hCost(neighbour, goal),
+      gScore.set(neighbour.state, tentativeGScore);
+      fScore.set(
+        neighbour.state,
+        tentativeGScore + hCost(neighbour.state, goal),
       );
 
       // Only add this neighbour if it is not already in our openSet
