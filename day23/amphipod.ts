@@ -97,6 +97,16 @@ const serialize = ({ a, b, c, d }: Burrows) =>
 export const equals = (a: Burrows) =>
   (b: Burrows) => serialize(a) === serialize(b);
 
+const isGoal = (state: Burrows) => {
+  const goal: Burrows = {
+    a: ["A1", "A2"],
+    b: ["B1", "B2"],
+    c: ["C1", "C2"],
+    d: ["D1", "D2"],
+  };
+  return equals(goal)(state);
+};
+
 /**
  * The shortest path distance from x to y
  */
@@ -127,11 +137,9 @@ export const distance = (x: Location, y: Location) => {
 };
 
 /**
- * Heuristic cost function, estimating the cost to get from state 'a' to state 'b'
- *
- * TODO the second arg is probably unnecessary since the goal state can be hardcoded
+ * Heuristic cost function, estimating the cost to get to the goal
  */
-const hCost = (a: Burrows, b: Burrows) => {
+const hCost = (state: Burrows) => {
   // TODO
   return -1;
 };
@@ -173,12 +181,6 @@ const burrowCostStore = () => {
  * We'll borrow a lot of the aStar implementation from day15
  */
 const aStarSearch = (start: Burrows) => {
-  const goal: Burrows = {
-    a: ["A1", "A2"],
-    b: ["B1", "B2"],
-    c: ["C1", "C2"],
-    d: ["D1", "D2"],
-  };
   const openSet: Array<Burrows> = [start];
 
   // Set from states to cost _to reach that point from the start_
@@ -187,7 +189,7 @@ const aStarSearch = (start: Burrows) => {
 
   // Set from states to current best estimate for total cost of a complete path through that state
   const fScore = burrowCostStore();
-  fScore.set(start, hCost(start, goal));
+  fScore.set(start, hCost(start));
 
   while (openSet.length > 0) {
     // Pops off the lowest fScore openSet member
@@ -195,7 +197,7 @@ const aStarSearch = (start: Burrows) => {
     if (!current) throw new Error("Popped nothing!");
 
     // We have reached the goal!
-    if (equals(current)(goal)) return gScore.get(current);
+    if (isGoal(current)) return gScore.get(current);
 
     const neighbours = getNeighbours(current);
     neighbours.forEach((neighbour) => {
@@ -209,7 +211,7 @@ const aStarSearch = (start: Burrows) => {
       gScore.set(neighbour.state, tentativeGScore);
       fScore.set(
         neighbour.state,
-        tentativeGScore + hCost(neighbour.state, goal),
+        tentativeGScore + hCost(neighbour.state),
       );
 
       // Only add this neighbour if it is not already in our openSet

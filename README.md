@@ -39,3 +39,9 @@ Or if you like to run them in watch mode:
 ```shell
 npm t -- --watch
 ```
+
+Or if you want to run just one day's tests:
+
+```shell
+npm t -- day23
+```
