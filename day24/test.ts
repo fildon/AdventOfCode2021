@@ -22,3 +22,9 @@ Deno.test("day24/machine reads input", () => {
   assertEquals(readingMachine.run(0), "VALID");
   assertEquals(readingMachine.run(1), "INVALID");
 });
+
+Deno.test("day24/multiplication", () => {
+  const multiplier = buildMachine(["add z 1", "inp w", "mul z w"]);
+  assertEquals(multiplier.run(0), "VALID");
+  assertEquals(multiplier.run(1), "INVALID");
+});

@@ -8,7 +8,7 @@ export const buildMachine = (instructions: Array<string>) => {
       const inputString = input.toString();
       let inputPointer = 0;
       while (remainingInstructions.length) {
-        const nextInstruction = remainingInstructions.pop();
+        const nextInstruction = remainingInstructions.shift();
         if (!nextInstruction) throw new Error("Popped nothing!");
         const [command, arg1, arg2] = nextInstruction.split(" ");
         switch (command) {
@@ -34,7 +34,13 @@ export const buildMachine = (instructions: Array<string>) => {
             break;
           }
           case "mul": {
-            // TODO
+            const a = state[arg1 as keyof typeof state];
+            const b = parseInt(arg2) ||
+              state[arg2 as keyof typeof state];
+            state = {
+              ...state,
+              [arg1]: a * b,
+            };
             break;
           }
           case "div": {
