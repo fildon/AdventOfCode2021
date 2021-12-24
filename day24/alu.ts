@@ -51,7 +51,7 @@ const add = (a: number, b: number) => a + b;
 const mul = (a: number, b: number) => a * b;
 const div = (a: number, b: number) => 0; // TODO
 const mod = (a: number, b: number) => 0; // TODO
-const eql = (a: number, b: number) => 0; // TODO
+const eql = (a: number, b: number) => a === b ? 1 : 0;
 
 /**
  * Given an instruction and a state returns a new state after executing that instruction

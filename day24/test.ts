@@ -28,3 +28,11 @@ Deno.test("day24/multiplication", () => {
   assertEquals(multiplier.run(0), "VALID");
   assertEquals(multiplier.run(1), "INVALID");
 });
+
+Deno.test("day24/equality", () => {
+  const equalizer = buildMachine(["inp z", "eql z 2"]);
+  // 1 !== 2 therefore z gets 0 which is VALID
+  assertEquals(equalizer.run(1), "VALID");
+  // 2 === 2 therefore z gets 1 which is INVALID
+  assertEquals(equalizer.run(2), "INVALID");
+});
