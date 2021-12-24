@@ -1,6 +1,7 @@
-import { getInputStrings } from "../utils/inputparsing.ts";
-
-type Variables = {
+/**
+ * The state of the machine at a point in time
+ */
+type MachineState = {
   w: number;
   x: number;
   y: number;
@@ -8,24 +9,20 @@ type Variables = {
 };
 
 /**
+ * A common interface for all executable functions
+ */
+type Executable = (...args: number[]) => number;
+
+/**
  * Given an input number, manages state of input consumption
  *
- * Returns a function to be invoked each time an input instruction
+ * Returns an executable to be invoked each time an input instruction
  * needs to be run.
  */
-const buildInputHandler = (input: number) => {
+const buildInputHandler = (input: number): Executable => {
   const inputString = input.toString();
   let inputPointer = 0;
-  return (state: Variables, target: string) => {
-    if (inputPointer >= inputString.length) {
-      throw new Error("Ran out of input to consume");
-    }
-    const inputValue = parseInt(inputString[inputPointer++]);
-    return {
-      ...state,
-      [target]: inputValue,
-    };
-  };
+  return () => parseInt(inputString[inputPointer++]);
 };
 
 /**
@@ -33,10 +30,11 @@ const buildInputHandler = (input: number) => {
  */
 const parseInstruction = (
   instruction: string | undefined,
-  state: Variables,
+  state: MachineState,
 ) => {
   if (!instruction) throw new Error("Tried to parse undefined instruction!");
   const [command, target, ...others] = instruction.split(" ");
+  // Each arg is either a primitive integer, or a key to use for value lookup
   const args = [target, ...others].map((keyOrValue) =>
     parseInt(keyOrValue) || state[keyOrValue as keyof typeof state]
   );
@@ -47,49 +45,60 @@ const parseInstruction = (
   };
 };
 
-const add = (a: number, b: number) => a + b;
-const mul = (a: number, b: number) => a * b;
-const div = (a: number, b: number) => Math.floor(a / b);
-const mod = (a: number, b: number) => 0; // TODO
-const eql = (a: number, b: number) => a === b ? 1 : 0;
+/**
+ * Builds the set of executables for a given input
+ */
+const buildExecutables = (
+  input: number,
+): Partial<Record<string, Executable>> => ({
+  inp: buildInputHandler(input),
+  add: (a, b) => a + b,
+  mul: (a, b) => a * b,
+  div: (a, b) => Math.floor(a / b),
+  mod: (a, b) => a % b,
+  eql: (a, b) => a === b ? 1 : 0,
+});
 
 /**
  * Given an instruction and a state returns a new state after executing that instruction
  */
 const executeInstruction = (
-  inputHandler: ReturnType<typeof buildInputHandler>,
+  executables: Partial<Record<string, Executable>>,
 ) =>
   (
-    state: Variables,
+    state: MachineState,
     instruction: string,
-  ): Variables => {
+  ): MachineState => {
     const { command, target, args } = parseInstruction(instruction, state);
-    if (command === "inp") return inputHandler(state, target);
-    const executable = { add, mul, div, mod, eql }[command];
+    const executable = executables[command];
     if (!executable) throw new Error("Unrecognised instruction");
-    return { ...state, [target]: args.reduce(executable) };
+    return { ...state, [target]: executable(...args) };
   };
 
-export const buildMachine = (instructions: Array<string>) => {
-  return {
-    run: (input: number) =>
-      instructions.reduce(executeInstruction(buildInputHandler(input)), {
+/**
+ * Builds a machine from an instruction list
+ *
+ * Returns a function which takes input and returns the validity of the z
+ * variable after running all instructions with that input
+ */
+export const buildMachine = (instructions: Array<string>) =>
+  (input: number) =>
+    instructions.reduce(
+        executeInstruction(buildExecutables(input)),
+        {
           w: 0,
           x: 0,
           y: 0,
           z: 0,
-        }).z ===
-          0
-        ? "VALID"
-        : "INVALID",
-  };
-};
+        },
+      ).z ===
+        0
+      ? "VALID"
+      : "INVALID";
 
-export const solvePart1 = (filePath: string) => {
-  const instructions = getInputStrings(filePath).filter((str) =>
-    str.length > 0
-  );
-  const machine = buildMachine(instructions);
+export const solvePart1 = () => {
+  // TODO get non-empty instruction strings
+  // TODO build machine
   // TODO binary chop between zero and the largest 14 digit number
   // The number must also not have any zero digits
   throw new Error("not implemented");
