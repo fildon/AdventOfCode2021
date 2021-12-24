@@ -36,3 +36,13 @@ Deno.test("day24/equality", () => {
   // 2 === 2 therefore z gets 1 which is INVALID
   assertEquals(equalizer.run(2), "INVALID");
 });
+
+Deno.test("day24/division", () => {
+  const divider = buildMachine(["inp z", "div z 2", "eql z 3"]);
+  // 7 / 2 === 3 so z is 1 "INVALID"
+  assertEquals(divider.run(7), "INVALID");
+  // 6 / 2 === 3 so z is 1 "INVALID"
+  assertEquals(divider.run(6), "INVALID");
+  // 5 / 2 === 2 so z is 0 "VALID"
+  assertEquals(divider.run(5), "VALID");
+});

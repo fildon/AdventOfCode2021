@@ -49,7 +49,7 @@ const parseInstruction = (
 
 const add = (a: number, b: number) => a + b;
 const mul = (a: number, b: number) => a * b;
-const div = (a: number, b: number) => 0; // TODO
+const div = (a: number, b: number) => Math.floor(a / b);
 const mod = (a: number, b: number) => 0; // TODO
 const eql = (a: number, b: number) => a === b ? 1 : 0;
 
