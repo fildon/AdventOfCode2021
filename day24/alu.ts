@@ -1,3 +1,5 @@
+import { getInputStrings } from "../utils/inputparsing.ts";
+
 /**
  * The state of the machine at a point in time
  */
@@ -45,6 +47,25 @@ const parseInstruction = (
   };
 };
 
+const compileInstruction = (
+  instruction: string | undefined,
+  state: { w: string; x: string; y: string; z: string },
+) => {
+  if (!instruction) throw new Error("Tried to compile undefined instruction!");
+  const [command, target, ...others] = instruction.split(" ");
+  const args = [target, ...others].filter((x) => !!x).map((arg) => {
+    if (["w", "x", "y", "z"].includes(arg)) {
+      return state[arg as keyof typeof state];
+    }
+    return arg;
+  });
+  return {
+    command,
+    target,
+    args,
+  };
+};
+
 /**
  * Builds the set of executables for a given input
  */
@@ -75,14 +96,90 @@ const executeInstruction = (
     return { ...state, [target]: executable(...args) };
   };
 
+const buildInputCompiler = () => {
+  const inputVariables = [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+  ];
+  let inputPointer = 0;
+  return () => inputVariables[inputPointer++];
+};
+
+const buildCommandCompilers = (): Partial<
+  Record<string, (...args: string[]) => string>
+> => ({
+  inp: buildInputCompiler(),
+  add: (a, b) => {
+    if (a === "0") return b;
+    if (b === "0") return a;
+    return `(${a} + ${b})`;
+  },
+  mul: (a, b) => {
+    if (a === "0" || b === "0") return "0";
+    if (a === "1") return b;
+    if (b === "1") return a;
+    return `(${a} * ${b})`;
+  },
+  div: (a, b) => {
+    if (b === "1") return a;
+    return `(${a} / ${b})`;
+  },
+  mod: (a, b) => `(${a} % ${b})`,
+  eql: (a, b) => `(${a} === ${b})`,
+});
+
+const compose = (
+  commandCompilers: Partial<Record<string, (...args: string[]) => string>>,
+) =>
+  (
+    state: { w: string; x: string; y: string; z: string },
+    instruction: string,
+  ) => {
+    const { command, target, args } = compileInstruction(instruction, state);
+    const commandCompiler = commandCompilers[command];
+    if (!commandCompiler) {
+      throw new Error(`Unrecognised instruction: ${instruction}`);
+    }
+    return { ...state, [target]: commandCompiler(...args) };
+  };
+
 /**
  * Builds a machine from an instruction list
  *
  * Returns a function which takes input and returns the validity of the z
  * variable after running all instructions with that input
  */
-export const buildMachine = (instructions: Array<string>) =>
-  (input: number) =>
+export const buildMachine = (instructions: Array<string>) => ({
+  /**
+   * Compiles this instruction to a set of mathematical expressions
+   *
+   * The resulting expression is the value of z after all instructions are applied
+   *
+   * For each of the 14 input digits, the letters A-N are used
+   */
+  compile: () =>
+    instructions.reduce(compose(buildCommandCompilers()), {
+      w: "0",
+      x: "0",
+      y: "0",
+      z: "0",
+    }).z,
+  /**
+   * Runs this machine for a given input
+   */
+  run: (input: number) =>
     instructions.reduce(
         executeInstruction(buildExecutables(input)),
         {
@@ -94,12 +191,13 @@ export const buildMachine = (instructions: Array<string>) =>
       ).z ===
         0
       ? "VALID"
-      : "INVALID";
+      : "INVALID",
+});
 
-export const solvePart1 = () => {
-  // TODO get non-empty instruction strings
-  // TODO build machine
-  // TODO binary chop between zero and the largest 14 digit number
-  // The number must also not have any zero digits
-  throw new Error("not implemented");
+const nonEmpty = (input: { length: number }) => input.length > 0;
+
+export const solvePart1 = (filePath: string) => {
+  const instructions = getInputStrings(filePath).filter(nonEmpty);
+  const machine = buildMachine(instructions);
+  return machine.compile();
 };
