@@ -1,68 +1,87 @@
 import { getInputStrings } from "../utils/inputparsing.ts";
 
+type Variables = {
+  w: number;
+  x: number;
+  y: number;
+  z: number;
+};
+
+/**
+ * Given an input number, manages state of input consumption
+ *
+ * Returns a function to be invoked each time an input instruction
+ * needs to be run.
+ */
+const buildInputHandler = (input: number) => {
+  const inputString = input.toString();
+  let inputPointer = 0;
+  return (state: Variables, target: string) => {
+    if (inputPointer >= inputString.length) {
+      throw new Error("Ran out of input to consume");
+    }
+    const inputValue = parseInt(inputString[inputPointer++]);
+    return {
+      ...state,
+      [target]: inputValue,
+    };
+  };
+};
+
+/**
+ * Parses an instruction string to a collection of useful values
+ */
+const parseInstruction = (
+  instruction: string | undefined,
+  state: Variables,
+) => {
+  if (!instruction) throw new Error("Tried to parse undefined instruction!");
+  const [command, target, ...others] = instruction.split(" ");
+  const args = [target, ...others].map((keyOrValue) =>
+    parseInt(keyOrValue) || state[keyOrValue as keyof typeof state]
+  );
+  return {
+    command,
+    target,
+    args,
+  };
+};
+
+const add = (a: number, b: number) => a + b;
+const mul = (a: number, b: number) => a * b;
+const div = (a: number, b: number) => 0; // TODO
+const mod = (a: number, b: number) => 0; // TODO
+const eql = (a: number, b: number) => 0; // TODO
+
+/**
+ * Given an instruction and a state returns a new state after executing that instruction
+ */
+const executeInstruction = (
+  inputHandler: ReturnType<typeof buildInputHandler>,
+) =>
+  (
+    state: Variables,
+    instruction: string,
+  ): Variables => {
+    const { command, target, args } = parseInstruction(instruction, state);
+    if (command === "inp") return inputHandler(state, target);
+    const executable = { add, mul, div, mod, eql }[command];
+    if (!executable) throw new Error("Unrecognised instruction");
+    return { ...state, [target]: args.reduce(executable) };
+  };
+
 export const buildMachine = (instructions: Array<string>) => {
   return {
-    run: (input: number) => {
-      const remainingInstructions = [...instructions];
-      let state = { w: 0, x: 0, y: 0, z: 0 };
-      const inputString = input.toString();
-      let inputPointer = 0;
-      while (remainingInstructions.length) {
-        const nextInstruction = remainingInstructions.shift();
-        if (!nextInstruction) throw new Error("Popped nothing!");
-        const [command, arg1, arg2] = nextInstruction.split(" ");
-        switch (command) {
-          case "inp": {
-            if (inputPointer >= inputString.length) {
-              throw new Error("Ran out of input to consume");
-            }
-            state = {
-              ...state,
-              [arg1]: parseInt(inputString[inputPointer]),
-            };
-            inputPointer++;
-            break;
-          }
-          case "add": {
-            const a = state[arg1 as keyof typeof state];
-            const b = parseInt(arg2) ||
-              state[arg2 as keyof typeof state];
-            state = {
-              ...state,
-              [arg1]: a + b,
-            };
-            break;
-          }
-          case "mul": {
-            const a = state[arg1 as keyof typeof state];
-            const b = parseInt(arg2) ||
-              state[arg2 as keyof typeof state];
-            state = {
-              ...state,
-              [arg1]: a * b,
-            };
-            break;
-          }
-          case "div": {
-            // TODO
-            break;
-          }
-          case "mod": {
-            // TODO
-            break;
-          }
-          case "eql": {
-            // TODO
-            break;
-          }
-          default: {
-            throw new Error(`Unrecognised instruction: ${nextInstruction}`);
-          }
-        }
-      }
-
-      return state.z === 0 ? "VALID" : "INVALID";
-    },
+    run: (input: number) =>
+      instructions.reduce(executeInstruction(buildInputHandler(input)), {
+          w: 0,
+          x: 0,
+          y: 0,
+          z: 0,
+        }).z ===
+          0
+        ? "VALID"
+        : "INVALID",
   };
 };
 
