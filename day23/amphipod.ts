@@ -140,6 +140,7 @@ export const distance = (x: Location, y: Location) => {
  * Heuristic cost function, estimating the cost to get to the goal
  */
 const hCost = (state: Burrows) => {
+  // TODO include estimated cost of obstacles?
   const aCost = Math.min(
     distance(state.a[0], "A1") + distance(state.a[1], "A2"),
     distance(state.a[1], "A1") + distance(state.a[0], "A2"),
@@ -147,17 +148,41 @@ const hCost = (state: Burrows) => {
   const bCost = Math.min(
     distance(state.b[0], "B1") + distance(state.b[1], "B2"),
     distance(state.b[1], "B1") + distance(state.b[0], "B2"),
-  );
+  ) * 10;
   const cCost = Math.min(
     distance(state.c[0], "C1") + distance(state.c[1], "C2"),
     distance(state.c[1], "C1") + distance(state.c[0], "C2"),
-  );
+  ) * 100;
   const dCost = Math.min(
     distance(state.d[0], "D1") + distance(state.d[1], "D2"),
     distance(state.d[1], "D1") + distance(state.d[0], "D2"),
-  );
+  ) * 1000;
 
   return aCost + bCost + cCost + dCost;
+};
+
+const getOccupant = (
+  state: Burrows,
+  location: Location,
+): "A" | "B" | "C" | "D" | undefined => {
+  if (state.a.includes(location)) return "A";
+  if (state.b.includes(location)) return "B";
+  if (state.c.includes(location)) return "C";
+  if (state.d.includes(location)) return "D";
+  return undefined;
+};
+
+/**
+ * Is the amphipod at this location happy (i.e. should never move again)?
+ */
+const isHappy = (state: Burrows, location: Location) => {
+  if (location[0] === "H") return false;
+  const occupant = getOccupant(state, location);
+  if (!occupant) return false;
+  if (occupant !== location[0]) return false;
+  if (location.includes("2")) return true;
+  // We are in our destination room at slot 1... we are happy if our friend is at slot 2
+  return getOccupant(state, `${occupant}2`) === occupant;
 };
 
 /**
@@ -170,6 +195,8 @@ const getNeighboursFor = (
   (
     start: Location,
   ): Array<{ cost: number; state: Burrows }> => {
+    if (isHappy(state, start)) return [];
+
     const results: Array<{ cost: number; state: Burrows }> = [];
 
     const amphipodType = state.a.includes(start)
@@ -190,7 +217,9 @@ const getNeighboursFor = (
         adjacencyMap[location]
       ).filter((location) => !visited.has(location)).filter((location) => {
         // Never stop in someone else's location
-        ![...state.a, ...state.b, ...state.c, ...state.d].includes(location);
+        return ![...state.a, ...state.b, ...state.c, ...state.d].includes(
+          location,
+        );
       });
 
       // We have exhausted all possibilities
@@ -198,16 +227,66 @@ const getNeighboursFor = (
 
       // We haven't exhausted all possibilities!
       newVisited.forEach((location) => visited.add(location));
-      newVisited.filter((location) =>
+      newVisited.filter((location) => {
+        if (start[0] === "H") return true;
+        return start[0] !== location[0];
+      }).filter((location) =>
         // Never stop in the hallway in front of a room
         !["H02", "H04", "H06", "H08"].includes(location)
       ).filter((location) => {
         // If start is a hallway, we must move into destination
-        if (!["H02", "H04", "H06", "H08"].includes(start)) return true;
-        return (location as string).includes(amphipodType);
+        if (
+          ![
+            "H01",
+            "H02",
+            "H03",
+            "H04",
+            "H05",
+            "H06",
+            "H07",
+            "H08",
+            "H09",
+            "H10",
+          ].includes(
+            start,
+          )
+        ) {
+          return true;
+        }
+        // We must get to ideal, unless it is occupied. Otherwise secondary will do.
+        const ideal = `${amphipodType}2` as Location;
+        const secondary = `${amphipodType}1` as Location;
+        if (![...state.a, ...state.b, ...state.c, ...state.d].includes(ideal)) {
+          // If ideal is empty we must go to it.
+          return location === ideal;
+        }
+
+        if (getOccupant(state, ideal) !== amphipodType) return false;
+
+        // otherwise we must move to secondary
+        return location === secondary;
       }).forEach((location) => {
-        const cost = { A: 1, B: 10, C: 100, D: 1000 }[amphipodType] * distance;
-        // TODO add new result in here
+        results.push({
+          cost: { A: 1, B: 10, C: 100, D: 1000 }[amphipodType] * distance,
+          state: {
+            a: state.a.map((x) => x === start ? location : x) as [
+              Location,
+              Location,
+            ],
+            b: state.b.map((x) => x === start ? location : x) as [
+              Location,
+              Location,
+            ],
+            c: state.c.map((x) => x === start ? location : x) as [
+              Location,
+              Location,
+            ],
+            d: state.d.map((x) => x === start ? location : x) as [
+              Location,
+              Location,
+            ],
+          },
+        });
       });
     }
   };
@@ -216,7 +295,7 @@ const getNeighboursFor = (
  * Given a burrows state, returns all states we can get to from here
  * in one move, and additionally return how much the given move cost
  */
-const getNeighbours = (current: Burrows): Array<{
+export const getNeighbours = (current: Burrows): Array<{
   cost: number;
   state: Burrows;
 }> =>
@@ -263,6 +342,12 @@ const aStarSearch = (start: Burrows) => {
     // Pops off the lowest fScore openSet member
     const current = openSet.sort((a, b) => fScore.get(b) - fScore.get(a)).pop();
     if (!current) throw new Error("Popped nothing!");
+    console.log({
+      count: openSet.length,
+      g: gScore.get(current),
+      f: fScore.get(current),
+      percent: 100 * (gScore.get(current) / fScore.get(current)),
+    });
 
     // We have reached the goal!
     if (isGoal(current)) return gScore.get(current);

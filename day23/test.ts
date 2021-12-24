@@ -1,11 +1,22 @@
-import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
+import {
+  assert,
+  assertEquals,
+} from "https://deno.land/std@0.117.0/testing/asserts.ts";
 import {
   Burrows,
   distance,
   equals,
+  getNeighbours,
   parseInput,
   solvePart1,
 } from "./amphipod.ts";
+
+const testStart = {
+  a: ["C1", "D2"],
+  b: ["A2", "B1"],
+  c: ["A1", "B2"],
+  d: ["C2", "D1"],
+};
 
 Deno.test("day23/burrow equality", () => {
   const x: Burrows = {
@@ -59,12 +70,22 @@ Deno.test("day23/parse input", () => {
   assertEquals(equals(parsedState)(expectedState), true);
 });
 
+Deno.test("day23/get neighbours", () => {
+  const neighbours = getNeighbours({
+    a: ["C1", "D2"],
+    b: ["A2", "B1"],
+    c: ["A1", "B2"],
+    d: ["C2", "D1"],
+  });
+  assertEquals(neighbours.length, 28);
+});
+
 Deno.test({
   name: "day23/solves part 1",
-  ignore: true,
+  ignore: false,
   fn: () => {
-    assertEquals(solvePart1("day23/testinput.txt"), 12521);
+    // assertEquals(solvePart1("day23/testinput.txt"), 12521);
     // TODO
-    // assertEquals(solvePart1("day23/input.txt"), -1);
+    assertEquals(solvePart1("day23/input.txt"), -1);
   },
 });
