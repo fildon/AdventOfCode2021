@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { equals, step } from "./cucumber.ts";
+import { equals, step, stepsToStop } from "./cucumber.ts";
 
 Deno.test("day25/equals", () => {
   assertEquals(equals([], []), true);
@@ -52,5 +52,15 @@ Deno.test("day25/step", () => {
       "vv...>>vv.",
       ">.v.v..v.v",
     ],
+  );
+});
+
+Deno.test("day25/steps to stop", () => {
+  assertEquals(stepsToStop([]), 1);
+  assertEquals(
+    stepsToStop([
+      ">.v",
+    ]),
+    2,
   );
 });

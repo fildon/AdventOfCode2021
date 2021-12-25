@@ -49,8 +49,15 @@ export const step = (current: Cucumbers): Cucumbers => {
 export const stepsToStop = (
   initial: Cucumbers,
 ): number => {
-  // TODO
-  throw new Error("not implemented");
+  let previous = initial;
+  let current = initial;
+  let steps = 0;
+  do {
+    previous = current;
+    current = step(current);
+    steps++;
+  } while (previous.join("") !== current.join(""));
+  return steps;
 };
 
 const nonEmpty = (input: { length: number }) => input.length > 0;
