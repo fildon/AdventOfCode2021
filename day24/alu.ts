@@ -199,5 +199,25 @@ const nonEmpty = (input: { length: number }) => input.length > 0;
 export const solvePart1 = (filePath: string) => {
   const instructions = getInputStrings(filePath).filter(nonEmpty);
   const machine = buildMachine(instructions);
-  return machine.compile();
+  // 14 nines
+  const start = 99999999999999;
+  let model = start;
+  // 13 nines
+  const lowerBound = 9999999999999;
+  // TODO rough estimate that this takes about 200 years to complete
+  while (model > lowerBound) {
+    if (model % 1000 === 999) {
+      const distanceFromStart = start - model;
+      const totalDistance = start - lowerBound;
+      console.log(
+        `percent: ${(100 * (distanceFromStart / totalDistance)).toFixed(8)}%`,
+      );
+    }
+    if (!model.toString().includes("0")) {
+      const result = machine.run(model);
+      if (result === "VALID") return model;
+    }
+    model--;
+  }
+  throw new Error("Failed to find valid model number");
 };

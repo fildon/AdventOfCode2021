@@ -65,7 +65,7 @@ Deno.test("day24/compile machine", () => {
 
 Deno.test({
   name: "day24/solves part 1",
-  ignore: true,
+  ignore: false,
   fn: () => {
     assertEquals(solvePart1("day24/input.txt"), -1);
   },
