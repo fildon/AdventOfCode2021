@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { equals, step, stepsToStop } from "./cucumber.ts";
+import { equals, solvePart1, step, stepsToStop } from "./cucumber.ts";
 
 Deno.test("day25/equals", () => {
   assertEquals(equals([], []), true);
@@ -63,4 +63,9 @@ Deno.test("day25/steps to stop", () => {
     ]),
     2,
   );
+});
+
+Deno.test("day25/solves part 1", () => {
+  assertEquals(solvePart1("day25/testinput.txt"), 58);
+  assertEquals(solvePart1("day25/input.txt"), 557);
 });
