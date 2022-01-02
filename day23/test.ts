@@ -1,56 +1,12 @@
-import {
-  assert,
-  assertEquals,
-} from "https://deno.land/std@0.117.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
 import {
   Burrows,
-  distance,
   equals,
-  getNeighbours,
+  getAmphipodLocations,
+  getMovesForLocation,
   parseInput,
   solvePart1,
 } from "./amphipod.ts";
-
-const testStart = {
-  a: ["C1", "D2"],
-  b: ["A2", "B1"],
-  c: ["A1", "B2"],
-  d: ["C2", "D1"],
-};
-
-Deno.test("day23/burrow equality", () => {
-  const x: Burrows = {
-    a: ["A1", "A2"],
-    b: ["H00", "H02"],
-    c: ["D1", "D2"],
-    d: ["H01", "H09"],
-  };
-  const y: Burrows = {
-    a: ["A1", "A2"],
-    b: ["H00", "H02"],
-    c: ["D1", "C2"],
-    d: ["H01", "H09"],
-  };
-  const z: Burrows = {
-    a: ["A1", "A2"],
-    b: ["H00", "H02"],
-    c: ["D1", "D2"],
-    d: ["H09", "H01"],
-  };
-
-  // x is not equal to y
-  assertEquals(equals(x)(y), false);
-
-  // x _is_ equal to z, even though they have different orderings
-  assertEquals(equals(x)(z), true);
-});
-
-Deno.test("day23/distance", () => {
-  assertEquals(distance("H02", "H02"), 0);
-  assertEquals(distance("H02", "H03"), 1);
-  assertEquals(distance("A1", "H03"), 2);
-  assertEquals(distance("A2", "H10"), 10);
-});
 
 Deno.test("day23/parse input", () => {
   const parsedState = parseInput([
@@ -61,31 +17,130 @@ Deno.test("day23/parse input", () => {
     "  #########",
     "",
   ]);
-  const expectedState: Burrows = {
-    a: ["C1", "D2"],
-    b: ["A2", "B1"],
-    c: ["A1", "B2"],
-    d: ["C2", "D1"],
-  };
+  const expectedState: Burrows = [
+    "#...........#",
+    "###C#B#A#D###",
+    "  #B#C#D#A#",
+  ];
   assertEquals(equals(parsedState)(expectedState), true);
 });
 
-Deno.test("day23/get neighbours", () => {
-  const neighbours = getNeighbours({
-    a: ["C1", "D2"],
-    b: ["A2", "B1"],
-    c: ["A1", "B2"],
-    d: ["C2", "D1"],
-  });
-  assertEquals(neighbours.length, 28);
+Deno.test("day23/get amphipod locations", () => {
+  assertEquals(getAmphipodLocations([]), []);
+  assertEquals(getAmphipodLocations(["A"]), [[0, 0]]);
+  assertEquals(getAmphipodLocations([".A", "..", "B."]), [[0, 1], [2, 0]]);
+  assertEquals(
+    getAmphipodLocations(["#...........#", "###B#C#B#D###", "  #A#D#C#A#"]),
+    [
+      [1, 3],
+      [1, 5],
+      [1, 7],
+      [1, 9],
+      [2, 3],
+      [2, 5],
+      [2, 7],
+      [2, 9],
+    ],
+  );
+});
+
+Deno.test("day23/get moves for location", () => {
+  // Basic case
+  assertEquals(
+    getMovesForLocation([
+      "#...B.......#",
+      "###C#.#A#D###",
+      "  #B#C#D#A#",
+    ])([1, 3]),
+    [
+      {
+        state: [
+          "#.C.B.......#",
+          "###.#.#A#D###",
+          "  #B#C#D#A#",
+        ],
+        cost: 200,
+      },
+      {
+        state: [
+          "#C..B.......#",
+          "###.#.#A#D###",
+          "  #B#C#D#A#",
+        ],
+        cost: 300,
+      },
+    ],
+  );
+  // Forbid hallway-to-hallway moves case
+  assertEquals(
+    getMovesForLocation([
+      "#C..........#",
+      "###B#A#.#D###",
+      "  #B#D#C#A#",
+    ])([0, 1]),
+    [
+      {
+        state: [
+          "#...........#",
+          "###B#A#C#D###",
+          "  #B#D#C#A#",
+        ],
+        cost: 700,
+      },
+    ],
+  );
+  // Forbid moving out of happy position case
+  assertEquals(
+    getMovesForLocation([
+      "#C..........#",
+      "###A#.#B#D###",
+      "  #A#C#D#B#",
+    ])([1, 3]),
+    [],
+  );
+  // Forbid entering wrong destination
+  assertEquals(
+    getMovesForLocation([
+      "#C..........#",
+      "###B#.#A#D###",
+      "  #B#D#C#A#",
+    ])([0, 1]),
+    [],
+  );
+  // Forbid entering destination with unhappy flatmate
+  assertEquals(
+    getMovesForLocation([
+      "#C..........#",
+      "###B#A#.#D###",
+      "  #B#C#D#A#",
+    ])([0, 1]),
+    [],
+  );
+  // Bug regression
+  assertEquals(
+    getMovesForLocation([
+      "#DB.C.....B.#",
+      "###.#C#.#.###",
+      "  #A#D#.#A#",
+    ])([2, 3]),
+    [],
+  );
+  // Bug regression
+  assertEquals(
+    getMovesForLocation([
+      "#C........DA#",
+      "###B#A#.#.###",
+      "  #B#C#D#.#",
+    ])([2, 7]),
+    [],
+  );
 });
 
 Deno.test({
-  name: "day23/solves part 1",
-  ignore: false,
+  name: "day23/solves part 1 SLOW",
+  ignore: true, // takes 30 minutes
   fn: () => {
-    // assertEquals(solvePart1("day23/testinput.txt"), 12521);
-    // TODO
-    assertEquals(solvePart1("day23/input.txt"), -1);
+    assertEquals(solvePart1("day23/testinput.txt"), 12521);
+    assertEquals(solvePart1("day23/input.txt"), 11320);
   },
 });
