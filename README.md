@@ -7,6 +7,10 @@ This repository contains my solutions to the puzzles in
 
 - [Deno](https://deno.land/)
 
+This repo was written using version 1.16.3. 
+
+Later versions might also work, but have not been tested.
+
 Additionally I recommend using the
 [Deno VSCode extension](https://marketplace.visualstudio.com/items?itemName=denoland.vscode-deno)
 to provide intellisense, particularly when it comes to import paths with
